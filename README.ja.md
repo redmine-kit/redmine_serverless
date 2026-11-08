@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-Redmine を AWS のサーバーレスのサービスで動かすための Redmine のプラグインです。S3 の添付ファイル、Lambda での実行、SES でのメールの送信のやり直しと取り込み、プロジェクトごとのメールアドレス、AWS の側の管理画面を持ちます。[redmine-kit/serverless](https://github.com/redmine-kit/serverless) のプラグインで、S3 の添付ファイルは Lambda の外でも使えます。
+Redmine を AWS のサーバーレスのサービスで動かすための Redmine のプラグインです。S3 の添付ファイル、Lambda での実行、SES でのメールの送信のやり直しと取り込み、プロジェクトごとのメールアドレス、AWS の側の管理画面を持ちます。[Serverless](https://github.com/redmine-kit/serverless) のプラグインで、S3 の添付ファイルは Lambda の外でも使えます。
 
 [English](README.md)
 

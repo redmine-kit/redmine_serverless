@@ -4,21 +4,21 @@ Guidelines for people and coding agents working in this repository. See [README.
 
 ## What this project does
 
-Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS serverless services. It is used by [redmine-kit/serverless](https://github.com/redmine-kit/serverless), which runs Redmine on AWS Lambda. It is in the design stage: the repository holds the design documents.
+Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS serverless services. It is used by [Serverless](https://github.com/redmine-kit/serverless), which runs Redmine on AWS Lambda. It is in the design stage: the repository holds the design documents.
 
 ## Rules
 
 - **Redmine's extension points only:** do not edit Redmine's own files. Keep Redmine's standard behaviour wherever possible, and write only what running serverless needs.
 - **Features can be turned on separately:** each feature has the condition that turns it on; without it, Redmine behaves as standard.
 - **Replaced code:** when Redmine code is replaced, update the table of [replaced code](docs/attachments.md#replaced-code). When Redmine is upgraded, check that the original code in that table has not changed.
-- **Tests:** replaced and added code has tests, run with Redmine's own mechanism (`rake redmine:plugins:test`). The test plan is in redmine-kit/serverless ([testing.md](https://github.com/redmine-kit/serverless/blob/main/docs/testing.md#plugin-tests)).
+- **Tests:** replaced and added code has tests, run with Redmine's own mechanism (`rake redmine:plugins:test`). The test plan is in Serverless ([testing.md](https://github.com/redmine-kit/serverless/blob/main/docs/testing.md#plugin-tests)).
 - **Keep digests SHA256:** attachment tokens, ETags, thumbnails and the sharing of identical content rely on them.
 - **No secrets in the repository.**
 
 ## Documentation
 
 - **Two languages.** English is the source (`README.md`, `docs/`); the Japanese translation is `README.ja.md` and `docs/ja/`, with the same file names. Change both together.
-- **Layout.** The READMEs stay short. The details go in `docs/`, published at https://redmine-kit.github.io/redmine_serverless/ with [redmine-kit/docs-skeleton](https://github.com/redmine-kit/docs-skeleton). Links to the documentation of redmine-kit/serverless are absolute GitHub URLs.
+- **Layout.** The READMEs stay short. The details go in `docs/`, published at https://redmine-kit.github.io/redmine_serverless/ with [redmine-kit/docs-skeleton](https://github.com/redmine-kit/docs-skeleton). Links to the documentation of Serverless are absolute GitHub URLs.
 - **Anchors in Japanese.** Put `<a id="..."></a>` with the English heading's anchor before each Japanese heading.
 - **Facts.** State only what has been checked, with the date and the source. Mark what has not been checked yet.
 - **Japanese wording.** Plain, precise Japanese. Keep established technical terms. Do not use "版" for a version, and write "通知" rather than the noun "知らせ".

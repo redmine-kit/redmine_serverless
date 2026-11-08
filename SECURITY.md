@@ -1,6 +1,6 @@
 # Security
 
-Redmine Serverless is in the design stage. The security design of the whole system is in [redmine-kit/serverless](https://github.com/redmine-kit/serverless/blob/main/docs/security.md).
+Redmine Serverless is in the design stage. The security design of the whole system is in [Serverless](https://github.com/redmine-kit/serverless/blob/main/docs/security.md).
 
 ## Reporting a vulnerability
 
