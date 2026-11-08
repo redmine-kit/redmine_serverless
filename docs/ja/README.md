@@ -7,7 +7,7 @@ Redmine Serverless(`redmine_serverless`)は、Redmine を AWS のサーバーレ
 
 <a id="features"></a>
 
-## 中の機能
+## 機能
 
 Redmine の標準の動きをできるだけ保ち、自前で書くのは、サーバーレスで動かすのに要る部分だけにします。機能ごとに、有効にする条件を持たせます。条件がそろわない機能は、Redmine の標準のままに動きます。S3 の添付ファイルだけを、Lambda でない環境で使うこともできます。
 

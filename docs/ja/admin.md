@@ -1,6 +1,6 @@
 # 管理画面
 
-Redmine Serverless が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
+Redmine Serverless が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、その画面が使うプラグインの機能です([機能の一覧](README.md#features))。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
 
 この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/serverless/ja/sources.html) にあります。
 
