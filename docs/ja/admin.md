@@ -1,8 +1,8 @@
 # 管理画面
 
-自前のプラグイン `redmine_serverless` が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確かめ、操作できるようにします。
+自前のプラグイン `redmine_serverless` が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
 
-この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確かめたものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
+この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
 
 <a id="approach"></a>
 
@@ -40,7 +40,7 @@ Redmine の管理のメニューに「サーバーレス」を足し、5 つの�
 | 無効にした Redmine の設定 | 下の「Lambda で使えない Redmine の設定」の一覧と、今の値 | プラグインが決めた値 |
 | 接続の確認 | S3、SQS、SES、SSM、DSQL に届くか、かかった時間 | ボタンを押したときに、軽い API を 1 回ずつ呼ぶ(下の表) |
 
-| 確かめる先 | 呼ぶ API |
+| 確認する先 | 呼ぶ API |
 | --- | --- |
 | S3(添付ファイル) | `HeadBucket` |
 | SQS | `GetQueueAttributes` |
@@ -48,7 +48,7 @@ Redmine の管理のメニューに「サーバーレス」を足し、5 つの�
 | SSM | `GetParametersByPath`(1 件だけ) |
 | DSQL | 新しい接続を作り(IAM の認証のトークンを作るところから)、`SELECT 1` を実行する。つないだデータベースのロール(`current_user`)と、今の接続を作ってからの時間(1 時間で切れる)も出す |
 
-- **使い道:** IAM の権限、DSQL のデータベースのロールの結び付け、SSM の設定を変えたあとに、どこまで届くかを画面で確かめられます。RDS にして VPC に入れたときは、エンドポイントやセキュリティグループの設定の確かめにも使えます([rds.md](https://redmine-kit.github.io/redmine-serverless/ja/rds.html))。
+- **使い道:** IAM の権限、DSQL のデータベースのロールの結び付け、SSM の設定を変えたあとに、どこまで届くかを画面で確認できます。RDS にして VPC に入れたときは、エンドポイントやセキュリティグループの設定の確認にも使えます([rds.md](https://redmine-kit.github.io/redmine-serverless/ja/rds.html))。
 
 <a id="redmine-settings-that-cannot-work-on-lambda"></a>
 
@@ -84,7 +84,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | テストのメール | Redmine の標準の「テストメールを送信」(管理の「設定」の「メール通知」)へのリンク。同じ機能は足さない | — |
 | 失敗したメール | 「ジョブ」の画面の、失敗したメールだけの一覧へのリンク | — |
 
-- **サプレッションリストを出す理由:** あるアドレスが一度バウンスすると、SES はそのアドレスへの送信を止めます。Redmine からは送れたように見えるので、「通知が届かない」と言われたときに、ここで確かめられるようにします。
+- **サプレッションリストを出す理由:** あるアドレスが一度バウンスすると、SES はそのアドレスへの送信を止めます。Redmine からは送れたように見えるので、「通知が届かない」と言われたときに、ここで確認できるようにします。
 - **テストのメール:** Redmine の標準のテストのメールは、画面の要求の中で送る(`deliver_now`)ので、`redmine-web` にも SES の送信の権限を付けます([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#ses))。
 
 <a id="jobs"></a>
@@ -116,7 +116,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 受信の設定 | 全体用のアドレス(`@` の前)、全体用のアドレスに届いたメールの扱い(既定のプロジェクトに入れるか、捨てるか)、プロジェクトごとの送信元を使うか | プラグインの設定(画面で変える)。DMARC が通らないメールは、設定によらず捨てる([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#spoofing-and-spam)) |
 
 - **取り込みの記録:** `redmine_serverless:receive_mail` が、メールごとの結果(宛先と、当てはめたプロジェクトを含む)を、プラグインのテーブル(`serverless_received_mails`)に残します。メールの本文は残さず、S3 の場所(`inbound/` か `processed/` のキー)を残します。記録は 90 日で消します([security.md](https://redmine-kit.github.io/redmine-serverless/ja/security.html#retention-periods))。
-- **捨てた理由:** ウイルス、迷惑メール、DMARC が通らない、登録のないアドレス、自動応答、Redmine の取り込みのエラーのどれかを出します。差出人を偽ったメールが来ていないかを、ここで確かめられます。
+- **捨てた理由:** ウイルス、迷惑メール、DMARC が通らない、登録のないアドレス、自動応答、Redmine の取り込みのエラーのどれかを出します。差出人を偽ったメールが来ていないかを、ここで確認できます。
 - **取り込み直し:** 画面から `redmine-task` を直接呼ばず、ジョブを SQS に積みます。`redmine-web` に Lambda を呼ぶ権限を持たせずに済みます。
 - **受信の設定を画面にする理由:** 既定のプロジェクトを変えるたびにデプロイしなくて済みます。`redmine_serverless:receive_mail` は、実行のたびにデータベースから設定を読みます。
 
@@ -148,7 +148,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 突き合わせ | データベースの添付ファイルのうち、S3 にないもの。S3 にあるが、どの添付ファイルからも使われていないもの | ボタンで、ジョブとして実行し、結果を画面に出す |
 | 直接の送信の確認 | バケットの CORS が、Redmine のドメインからの `POST` を許しているか | `GetBucketCors` |
 
-- **使い道:** 古い Redmine から添付ファイルを移したあと([migration.md](https://redmine-kit.github.io/redmine-serverless/ja/migration.html))に、突き合わせで漏れがないかを確かめられます。
+- **使い道:** 古い Redmine から添付ファイルを移したあと([migration.md](https://redmine-kit.github.io/redmine-serverless/ja/migration.html))に、突き合わせで漏れがないかを確認できます。
 
 <a id="permissions"></a>
 
@@ -164,7 +164,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 
 <a id="to-verify"></a>
 
-## 確かめること
+## 確認すること
 
 - Rails の ActiveJob で、やり直しを使い切ったときと、やり直さないエラーのときに、失敗を記録するのに使える仕組み(`after_discard` など)
-- 画面の要求の中で、新しい DSQL の接続を作って確かめるのに、どのくらい時間がかかるか
+- 画面の要求の中で、新しい DSQL の接続を作って確認するのに、どのくらい時間がかかるか

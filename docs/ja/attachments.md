@@ -1,10 +1,10 @@
 # 添付ファイルと S3
 
-Redmine の添付ファイルを S3 に置く設計です。アップロードは、ブラウザーから S3 に直接送ります。ダウンロードは、Redmine が権限を確かめてから、S3 の署名付き URL にリダイレクトします。ファイルの本体は Lambda を通りません。
+Redmine の添付ファイルを S3 に置く設計です。アップロードは、ブラウザーから S3 に直接送ります。ダウンロードは、Redmine が権限を確認してから、S3 の署名付き URL にリダイレクトします。ファイルの本体は Lambda を通りません。
 
 Redmine の S3 のプラグイン(下記)のやり方を参考に、自前のプラグイン `redmine_serverless` の機能として作ります。外部のプラグインは入れません。
 
-この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソース(7.0-stable の d718d63)で確かめたものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
+この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソース(7.0-stable の d718d63)で確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
 
 <a id="how-redmine-stores-attachments"></a>
 
@@ -16,7 +16,7 @@ Redmine は、添付ファイルをローカルのディスクに保存します
 - **digest の使い道:** 添付のトークン(`<id>.<digest>`)、ETag、サムネイルのファイル名、同じ内容のファイルの共有が、すべて `digest` に頼っています。
 - **ローカルのパスを使う処理:** サムネイル(ImageMagick、Ghostscript)、Office のファイルのプレビュー(Pandoc)、PDF の出力の画像、添付の一括のダウンロード(zip)、テキストと差分の表示が、`Attachment#diskfile` のパスを読みます。
 - **アップロードの流れ:** ブラウザーは、ファイルを選ぶとすぐに `POST /uploads.js` に生のバイト列を送ります(`app/assets/javascripts/attachments.js` の `uploadBlob`)。Redmine は、どこにも付いていない添付のレコードを作って、トークンを返します。チケットなどを保存するときに、トークンでレコードを付けます。
-- **ダウンロードの流れ:** `AttachmentsController#download` が、権限を確かめてから `send_file` でファイルを返します。
+- **ダウンロードの流れ:** `AttachmentsController#download` が、権限を確認してから `send_file` でファイルを返します。
 
 Lambda では、要求と応答が 6 MB までなので、この流れのままでは大きなファイルを扱えません。関数 URL はバイナリを base64 にするので、実際に送れるファイルは約 4.5 MB です(推測)。さらに、CloudFront を通る要求の本文は 1 MB までです([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#the-6-mb-limit))。
 
@@ -86,7 +86,7 @@ sequenceDiagram
   participant R as Redmine(Lambda)
   participant S as S3
   B->>R: POST /s3_uploads/presign(ファイル名、サイズ)
-  R->>R: 権限、拡張子、サイズを確かめる
+  R->>R: 権限、拡張子、サイズを確認する
   R-->>B: 署名付きの POST(incoming/UUID、サイズの上限)
   B->>S: POST(ファイルの本体)
   B->>R: POST /s3_uploads/complete(キー、ファイル名)
@@ -95,7 +95,7 @@ sequenceDiagram
   R-->>B: トークン(標準の流れと同じ応答)
 ```
 
-1. **署名を受け取る:** `POST /s3_uploads/presign` を足します。同一オリジンなので、rails-ujs が CSRF のトークンを付けます。権限は、標準のアップロードと同じもの(`authorize_global`)を確かめます。拡張子は `Attachment.valid_extension?` で、サイズは Redmine の添付の上限(`attachment_max_size`)で確かめます。署名付きの POST のポリシーで、キー(`incoming/<UUID>`)とサイズの範囲(`content-length-range`)を固定します。期限は 15 分です。
+1. **署名を受け取る:** `POST /s3_uploads/presign` を足します。同一オリジンなので、rails-ujs が CSRF のトークンを付けます。権限は、標準のアップロードと同じもの(`authorize_global`)を確認します。拡張子は `Attachment.valid_extension?` で、サイズは Redmine の添付の上限(`attachment_max_size`)で確認します。署名付きの POST のポリシーで、キー(`incoming/<UUID>`)とサイズの範囲(`content-length-range`)を固定します。期限は 15 分です。
 2. **S3 に送る:** ブラウザーが S3 に multipart の POST を送ります。1 回の送信は 5 GB までです。
 3. **登録する:** `POST /s3_uploads/complete` を足します。Redmine が S3 のオブジェクトを読みながら SHA256 を計算し、サイズは S3 の値を使います。同じ digest とサイズの添付がすでにあれば、そのファイルを共有し、送られたオブジェクトは消します(Redmine の `reuse_existing_file_if_possible` と同じ考え方)。なければ `files/<年>/<月>/<ファイル名>` にコピーし、`incoming/` のオブジェクトを消します。そのうえで、添付のレコードを `disk_directory`、`disk_filename`、`digest`、`filesize` を指定して作ります。ファイルの本体を Redmine に渡さないので、`files_to_final_location` は何もしません。
 4. **トークンを返す:** 応答は、標準の `POST /uploads.js` と同じテンプレート(`attachments/upload.js.erb`)で返します。ブラウザーの側は、標準の流れと同じくトークンをフォームに入れます。
@@ -128,7 +128,7 @@ CloudFront を通る要求の本文は、本文のハッシュを入れる Lambd
 2. ダウンロードの回数を数えます(バージョンとプロジェクトのファイル。Redmine の標準と同じ)。
 3. 署名付きの GET の URL(期限 5 分)に 302 でリダイレクトします。`response-content-disposition` と `response-content-type` で、Redmine と同じファイル名と表示のしかたを指定します。Redmine は、PDF だけを `inline`、ほかを `attachment` にします(`AttachmentsController#disposition`)。
 
-- **ファイルがあるかの確認:** Redmine は、ダウンロードの前にローカルのファイルがあるかを確かめます(`file_readable`、`Attachment#readable?`)。この確認は、S3 の HeadObject に替えます。
+- **ファイルがあるかの確認:** Redmine は、ダウンロードの前にローカルのファイルがあるかを確認します(`file_readable`、`Attachment#readable?`)。この確認は、S3 の HeadObject に替えます。
 - **画像の表示:** wiki やチケットの本文の画像(`/attachments/download/<id>/<名前>`)も、同じリダイレクトで表示されます。`<img>` は、`attachment` の指定があっても画像を表示します。画像の数だけ Lambda が呼ばれるので、画像の多いページでは、同時の要求の数だけ環境が起動します(推測。作ったあとで測る)。
 - **CSP:** Redmine は、添付を返すときに `sandbox` の CSP を付けます。S3 からの応答にはこれが付きません。ファイルは S3 のドメインから返るので、Redmine のドメインの Cookie には触れられません。
 - **署名の期限:** 署名は Lambda の実行ロールの一時的な認証情報で作ります。この認証情報が切れると、URL の期限の前でも無効になります。期限を 5 分と短くするので、影響はないと見ています。
@@ -164,7 +164,7 @@ sequenceDiagram
   participant R as Redmine(Lambda)
   participant S as S3
   B->>R: GET /attachments/<種類>/<ID>/download
-  R->>R: 権限と合計の大きさを確かめる(Redmine の標準)
+  R->>R: 権限と合計の大きさを確認する(Redmine の標準)
   R->>S: GetObject(添付ファイルを 1 つずつ)
   R->>R: /tmp に zip を書く
   R->>S: PutObject(tmp/bulk/UUID.zip)
@@ -172,7 +172,7 @@ sequenceDiagram
   B->>S: GET(zip)
 ```
 
-1. **確かめる:** Redmine の標準の確認(添付ファイルが見えるか、合計が `bulk_download_max_size` を超えないか)を、そのまま通します。
+1. **確認する:** Redmine の標準の確認(添付ファイルが見えるか、合計が `bulk_download_max_size` を超えないか)を、そのまま通します。
 2. **作る:** 添付ファイルを S3 から 1 つずつ読みながら、`/tmp` に zip を書きます。Redmine の標準のように、すべてのファイルをメモリに読みません。
 3. **置く:** zip を `tmp/bulk/<UUID>.zip` に置きます(大きければマルチパートのアップロード)。`/tmp` の zip は消します。
 4. **返す:** 署名付きの GET の URL(期限 5 分)に 302 でリダイレクトします。ファイル名は Redmine と同じ(`<種類>-<ID>-attachments.zip`)にし、`response-content-disposition` で `attachment` にします。
@@ -181,7 +181,7 @@ sequenceDiagram
 - **仮のファイルを消す:** `tmp/` の下は、ライフサイクルで 1 日後に消します。
 - **ほかの出力:** チケットの一覧の CSV や PDF、wiki の HTML などの出力は、Redmine から、そのまま返します。チケットの出力は既定で 500 件まで(`issues_export_limit`)で、ほかの出力も文字が中心で圧縮されるので、6 MB に届かない見込みです([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#the-6-mb-limit))。
 - **作り直さない:** 同じ添付ファイルの組み合わせ(添付ファイルの ID と digest から作るキー)の zip が、まだ `tmp/bulk/` にあれば、作り直さずにリダイレクトします。
-- **ファイルがあるかの確認:** Redmine は、添付ファイルごとに `readable?` で確かめます。この設計では `readable?` が S3 の HeadObject なので、添付ファイルの数だけ HeadObject を送ります(推測。数が多いと遅くなる。作るときに測る)。
+- **ファイルがあるかの確認:** Redmine は、添付ファイルごとに `readable?` で確認します。この設計では `readable?` が S3 の HeadObject なので、添付ファイルの数だけ HeadObject を送ります(推測。数が多いと遅くなる。作るときに測る)。
 
 <a id="the-tmp-cache"></a>
 
@@ -193,8 +193,8 @@ Redmine の `attachments_storage_path` を `/tmp/redmine/files` にし、ここ�
 - **取り方:** `Attachment#diskfile` を差し替え、パスを返す前に次のように判断します。
   - ローカルにファイルがあれば、そのパスを返します。保存の途中(`files_to_final_location` がファイルを作ったあと)もこれに当たり、S3 には取りに行きません。
   - ローカルになく、レコードが保存済みなら、S3 から取ってからパスを返します。別の名前で書いてから名前を変えるので、途中のファイルを読むことはありません。
-  - 削除(`delete_from_disk!`)と、ファイルがあるかの確認(`readable?`)は、`diskfile` を通さないように差し替えます。消すだけのファイルや、確かめるだけのファイルを取りに行かないためです。
-- **古くならない:** 添付ファイルは一度保存したら変わらないので、キャッシュを確かめ直す必要はありません。
+  - 削除(`delete_from_disk!`)と、ファイルがあるかの確認(`readable?`)は、`diskfile` を通さないように差し替えます。消すだけのファイルや、確認するだけのファイルを取りに行かないためです。
+- **古くならない:** 添付ファイルは一度保存したら変わらないので、キャッシュを確認直す必要はありません。
 - **大きさ:** 関数の `/tmp` を 2,048 MB にし、1,536 MB を超えたら古いものから消します。環境が消えると、キャッシュも消えます。
 - **CSV のインポート:** インポートのファイルも、`/tmp/redmine/imports` に書いたあと `imports/` に PutObject し、読むときにローカルになければ S3 から取ります。`Import#filepath` は `Rails.root/tmp/imports` に固定されているので、イメージの `tmp` を `/tmp/redmine` へのシンボリックリンクにします([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#read-only-file-system))。
 - **Office のファイルのプレビューのキャッシュ:** Redmine は `files/derived_cache/` に置きます。`/tmp` のキャッシュの中に置き、S3 には置きません。環境ごとに作り直します。
@@ -228,7 +228,7 @@ Redmine 本体のファイルは書き換えず、プラグイン `redmine_serve
 | `Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?` | Lambda の上では、決めた値(空か無効)を返す。保存しても変えない | Lambda で使えない設定([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)) |
 
 - **有効にする条件:** S3 のバケットの設定(環境変数)があるときだけ、差し替えを有効にします。設定がなければ、Redmine の標準のままに動きます。Redmine 本体のテストを、そのまま通せるようにするためです([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#redmines-own-tests))。
-- **Redmine の更新:** Redmine のバージョンを上げるときは、差し替えた処理の元のコードが変わっていないかを確かめます。差し替えの一覧は、この表を正とします。元のコードが変わったら、テストが失敗するようにします([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#redmines-own-tests))。
+- **Redmine の更新:** Redmine のバージョンを上げるときは、差し替えた処理の元のコードが変わっていないかを確認します。差し替えの一覧は、この表を正とします。元のコードが変わったら、テストが失敗するようにします([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#redmines-own-tests))。
 - **テスト:** 差し替えた処理ごとに、Redmine のテストの仕組みでテストを書きます([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#attachments-in-s3))。
 
 <a id="permissions"></a>
@@ -239,7 +239,7 @@ Redmine 本体のファイルは書き換えず、プラグイン `redmine_serve
 
 <a id="to-verify"></a>
 
-## 確かめること
+## 確認すること
 
 - 登録のときの SHA256 の計算で、60 秒に収まるファイルの大きさ
 - 署名付きの GET で、日本語のファイル名が正しく保存されるか(`response-content-disposition` の書き方)
