@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-Redmine Serverless(`redmine_serverless`)は、Redmine を AWS のサーバーレス(Lambda と AWS のマネージドサービス)で動かすための Redmine のプラグインです。[Serverless](https://redmine-kit.github.io/serverless/ja/architecture.html) が、Lambda 用のイメージに入れて使います。Redmine 本体のファイルは書き換えず、Redmine の標準の拡張の仕組みだけで作ります。今は設計の段階で、資料だけがあります。
+Redmine Serverless(`redmine_serverless`)は、Redmine を AWS のサーバーレス(Lambda と AWS のマネージドサービス)で動かすための Redmine のプラグインです。[Serverless](https://redmine-kit.github.io/serverless/ja/architecture.html) が、Lambda 用のイメージに入れて使います。Redmine 本体のファイルは書き換えず、Redmine の標準の拡張の仕組みだけで作ります。今は設計段階で、資料だけがあります。
 
 - [S3 の添付ファイル](attachments.md): 保存、アップロード、ダウンロード、キャッシュ
 - [管理画面](admin.md): 状態と接続、メールの送信、ジョブ、メールの受信、添付ファイルの S3
