@@ -2,7 +2,7 @@
 
 Redmine Serverless が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
 
-この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
+この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/serverless/ja/sources.html) にあります。
 
 <a id="approach"></a>
 
@@ -48,7 +48,7 @@ Redmine の管理のメニューに「サーバーレス」を足し、5 つの�
 | SSM | `GetParametersByPath`(1 件だけ) |
 | DSQL | 新しい接続を作り(IAM の認証のトークンを作るところから)、`SELECT 1` を実行する。つないだデータベースのロール(`current_user`)と、今の接続を作ってからの時間(1 時間で切れる)も出す |
 
-- **使い道:** IAM の権限、DSQL のデータベースのロールの結び付け、SSM の設定を変えたあとに、どこまで届くかを画面で確認できます。RDS にして VPC に入れたときは、エンドポイントやセキュリティグループの設定の確認にも使えます([rds.md](https://redmine-kit.github.io/redmine-serverless/ja/rds.html))。
+- **使い道:** IAM の権限、DSQL のデータベースのロールの結び付け、SSM の設定を変えたあとに、どこまで届くかを画面で確認できます。RDS にして VPC に入れたときは、エンドポイントやセキュリティグループの設定の確認にも使えます([rds.md](https://redmine-kit.github.io/serverless/ja/rds.html))。
 
 <a id="redmine-settings-that-cannot-work-on-lambda"></a>
 
@@ -61,12 +61,12 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 使用するバージョン管理システム(`enabled_scm`) | 管理 › 設定 › リポジトリ | 空に固定する。プロジェクトにリポジトリを作れなくなる | リポジトリを置く場所がない(`/tmp` は環境ごとで、消える)。Git などのコマンドもイメージに入れない |
 | コミットを自動取得する(`autofetch_changesets`) | 同上 | 無効に固定する | 同上 |
 | リポジトリ管理用のWebサービスを有効にする(`sys_api_enabled`) | 同上 | 無効に固定する | 同上 |
-| 受信メール用のWebサービスを有効にする(`mail_handler_api_enabled`) | 管理 › 設定 › 受信メール | 無効に固定する | メールは SES で受けて `redmine-task` が取り込む([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#receiving))。外から HTTP でメールを送り込める Web サービスを開けない |
+| 受信メール用のWebサービスを有効にする(`mail_handler_api_enabled`) | 管理 › 設定 › 受信メール | 無効に固定する | メールは SES で受けて `redmine-task` が取り込む([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#receiving))。外から HTTP でメールを送り込める Web サービスを開けない |
 | 添付ファイルサイズの上限(`attachment_max_size`) | 管理 › 設定 › ファイル | 変えられる。上限の目安の説明を足す | 画面からのアップロードは、登録のときの SHA256 の計算が 60 秒に収まる大きさまで。REST API の `POST /uploads.json` は 1 MB まで([attachments.md](attachments.md#upload)) |
 
 - **値を固定する:** プラグインが、上の設定の読み出し(`Setting.enabled_scm` など)を差し替えて、決めた値を返します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません。
 - **画面に表示する:** Redmine の設定の画面で、上の設定の入力を押せなくし、「サーバーレスの環境では使えません(Redmine Serverless)」と添えます。画面のテンプレートは差し替えず、設定の画面を開いたときだけ、プラグインが小さな JavaScript を読み込んで表示を変えます(Redmine の標準のフック `view_layouts_base_html_head`)。JavaScript が動かなくても、値は上のとおり固定されているので、効き目は変わりません。
-- **プロジェクトのモジュール:** バージョン管理システムを選べないので、モジュールの「リポジトリ」を有効にしても、リポジトリは作れません。新しいプロジェクトの既定のモジュール(`default_projects_modules`)からは外しておきます(設定のファイルの `redmine.settings`。[deploy-config.md](https://redmine-kit.github.io/redmine-serverless/ja/deploy-config.html))。
+- **プロジェクトのモジュール:** バージョン管理システムを選べないので、モジュールの「リポジトリ」を有効にしても、リポジトリは作れません。新しいプロジェクトの既定のモジュール(`default_projects_modules`)からは外しておきます(設定のファイルの `redmine.settings`。[deploy-config.md](https://redmine-kit.github.io/serverless/ja/deploy-config.html))。
 - **条件:** Lambda の上(`REDMINE_ROLE` があるとき)だけ固定します。手元のテストや、Lambda でない環境では、Redmine の標準のままです。
 - **管理画面の「情報」:** Redmine の標準の確認(ファイルの保存先に書き込めるか、ジョブのキューを既定から変えたか、ImageMagick、Ghostscript、Pandoc など)は、この設計で通る見込みです(保存先は `/tmp/redmine/files`、ジョブは `:sqs`)。
 
@@ -85,7 +85,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 失敗したメール | 「ジョブ」の画面の、失敗したメールだけの一覧へのリンク | — |
 
 - **サプレッションリストを出す理由:** あるアドレスが一度バウンスすると、SES はそのアドレスへの送信を止めます。Redmine からは送れたように見えるので、「通知が届かない」と言われたときに、ここで確認できるようにします。
-- **テストのメール:** Redmine の標準のテストのメールは、画面の要求の中で送る(`deliver_now`)ので、`redmine-web` にも SES の送信の権限を付けます([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#ses))。
+- **テストのメール:** Redmine の標準のテストのメールは、画面の要求の中で送る(`deliver_now`)ので、`redmine-web` にも SES の送信の権限を付けます([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#ses))。
 
 <a id="jobs"></a>
 
@@ -101,7 +101,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | デッドレターキューを戻す | デッドレターキューのジョブを、元のキューに戻す | SQS の `StartMessageMoveTask` |
 
 - **失敗の記録:** ジョブが最後に失敗したとき(やり直しを使い切ったときと、やり直さないエラーのとき)に、プラグインのテーブル(`serverless_job_failures`)に、ジョブの中身(`job.serialize`)とエラーを残します。プラグインの migration で、このテーブルを作ります。データベースに書けなかったときのために、デッドレターキューも残します。
-- **送り直しの流れ:** 原因を直してから(たとえば、SES の送信の再開、サプレッションリストからの削除)、送り直しのボタンを押します。メールの送り直しは、[mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#when-sending-fails) にあります。
+- **送り直しの流れ:** 原因を直してから(たとえば、SES の送信の再開、サプレッションリストからの削除)、送り直しのボタンを押します。メールの送り直しは、[mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#when-sending-fails) にあります。
 
 <a id="receiving-email"></a>
 
@@ -113,9 +113,9 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | MX のレコード | 受信のホスト名の MX が、SES の受信の宛先を向いているか | DNS を引く(Lambda の既定の DNS で、インターネットの名前を引く) |
 | 受け取ったメール | 受け取った時刻、差出人、件名、結果(作ったチケット、付けた注記、捨てた理由) | プラグインのテーブル(下記) |
 | 取り込み直し | 捨てたメールや失敗したメールを、もう一度取り込む | ジョブを SQS に積み、`redmine-worker` が取り込む |
-| 受信の設定 | 全体用のアドレス(`@` の前)、全体用のアドレスに届いたメールの扱い(既定のプロジェクトに入れるか、捨てるか)、プロジェクトごとの送信元を使うか | プラグインの設定(画面で変える)。DMARC が通らないメールは、設定によらず捨てる([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#spoofing-and-spam)) |
+| 受信の設定 | 全体用のアドレス(`@` の前)、全体用のアドレスに届いたメールの扱い(既定のプロジェクトに入れるか、捨てるか)、プロジェクトごとの送信元を使うか | プラグインの設定(画面で変える)。DMARC が通らないメールは、設定によらず捨てる([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#spoofing-and-spam)) |
 
-- **取り込みの記録:** `redmine_serverless:receive_mail` が、メールごとの結果(宛先と、当てはめたプロジェクトを含む)を、プラグインのテーブル(`serverless_received_mails`)に残します。メールの本文は残さず、S3 の場所(`inbound/` か `processed/` のキー)を残します。記録は 90 日で消します([security.md](https://redmine-kit.github.io/redmine-serverless/ja/security.html#retention-periods))。
+- **取り込みの記録:** `redmine_serverless:receive_mail` が、メールごとの結果(宛先と、当てはめたプロジェクトを含む)を、プラグインのテーブル(`serverless_received_mails`)に残します。メールの本文は残さず、S3 の場所(`inbound/` か `processed/` のキー)を残します。記録は 90 日で消します([security.md](https://redmine-kit.github.io/serverless/ja/security.html#retention-periods))。
 - **捨てた理由:** ウイルス、迷惑メール、DMARC が通らない、登録のないアドレス、自動応答、Redmine の取り込みのエラーのどれかを出します。差出人を偽ったメールが来ていないかを、ここで確認できます。
 - **取り込み直し:** 画面から `redmine-task` を直接呼ばず、ジョブを SQS に積みます。`redmine-web` に Lambda を呼ぶ権限を持たせずに済みます。
 - **受信の設定を画面にする理由:** 既定のプロジェクトを変えるたびにデプロイしなくて済みます。`redmine_serverless:receive_mail` は、実行のたびにデータベースから設定を読みます。
@@ -124,7 +124,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 
 ## プロジェクトのメールの設定
 
-プロジェクトの設定に「メール」のタブを足します。プロジェクトごとのアドレス([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#addresses-per-project))を設定します。
+プロジェクトの設定に「メール」のタブを足します。プロジェクトごとのアドレス([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#addresses-per-project))を設定します。
 
 | 項目 | 中身 |
 | --- | --- |
@@ -135,7 +135,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 登録のないアドレスの扱い | 取り込まない(既定)、匿名のユーザーで受ける、アカウントを作る(Redmine の `unknown_user` の `ignore`、`accept`、`create`) |
 
 - **開ける人:** Redmine の管理者と、プラグインが足すプロジェクトの権限「メールの設定の管理」を持つ人です。
-- **登録のないアドレスを受けるとき:** 問い合わせの窓口のように、外の人からのメールを受けるときに使います。迷惑メールが増えるので、DMARC の確認([mail.md](https://redmine-kit.github.io/redmine-serverless/ja/mail.html#spoofing-and-spam))を外さないようにします。
+- **登録のないアドレスを受けるとき:** 問い合わせの窓口のように、外の人からのメールを受けるときに使います。迷惑メールが増えるので、DMARC の確認([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#spoofing-and-spam))を外さないようにします。
 
 <a id="attachments-in-s3"></a>
 
@@ -148,19 +148,19 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 突き合わせ | データベースの添付ファイルのうち、S3 にないもの。S3 にあるが、どの添付ファイルからも使われていないもの | ボタンで、ジョブとして実行し、結果を画面に出す |
 | 直接の送信の確認 | バケットの CORS が、Redmine のドメインからの `POST` を許しているか | `GetBucketCors` |
 
-- **使い道:** 古い Redmine から添付ファイルを移したあと([migration.md](https://redmine-kit.github.io/redmine-serverless/ja/migration.html))に、突き合わせで漏れがないかを確認できます。
+- **使い道:** 古い Redmine から添付ファイルを移したあと([migration.md](https://redmine-kit.github.io/serverless/ja/migration.html))に、突き合わせで漏れがないかを確認できます。
 
 <a id="permissions"></a>
 
 ## 権限
 
-画面のために、`redmine-web` の実行ロールに、SES の状態を読む権限、SQS のキューの件数を読んでデッドレターキューを戻す権限、S3 の CORS を読む権限を足します。突き合わせのジョブのために、`redmine-worker` に S3 の一覧の権限を付けます。詳しくは [iam.md](https://redmine-kit.github.io/redmine-serverless/ja/iam.html) にあります。
+画面のために、`redmine-web` の実行ロールに、SES の状態を読む権限、SQS のキューの件数を読んでデッドレターキューを戻す権限、S3 の CORS を読む権限を足します。突き合わせのジョブのために、`redmine-worker` に S3 の一覧の権限を付けます。詳しくは [iam.md](https://redmine-kit.github.io/serverless/ja/iam.html) にあります。
 
 <a id="tests"></a>
 
 ## テスト
 
-画面ごとに、Redmine の機能のテストとシステムのテストを書きます([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#administration-pages))。
+画面ごとに、Redmine の機能のテストとシステムのテストを書きます([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#administration-pages))。
 
 <a id="to-verify"></a>
 

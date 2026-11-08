@@ -4,7 +4,7 @@ Redmine の添付ファイルを S3 に置く設計です。アップロード�
 
 Redmine の S3 のプラグイン(下記)のやり方を参考に、Redmine Serverless の機能として作ります。外部のプラグインは入れません。
 
-この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソース(7.0-stable の d718d63)で確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
+この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソース(7.0-stable の d718d63)で確認したものです。出典は [sources.md](https://redmine-kit.github.io/serverless/ja/sources.html) にあります。
 
 <a id="how-redmine-stores-attachments"></a>
 
@@ -18,7 +18,7 @@ Redmine は、添付ファイルをローカルのディスクに保存します
 - **アップロードの流れ:** ブラウザーは、ファイルを選ぶとすぐに `POST /uploads.js` に生のバイト列を送ります(`app/assets/javascripts/attachments.js` の `uploadBlob`)。Redmine は、どこにも付いていない添付のレコードを作って、トークンを返します。チケットなどを保存するときに、トークンでレコードを付けます。
 - **ダウンロードの流れ:** `AttachmentsController#download` が、権限を確認してから `send_file` でファイルを返します。
 
-Lambda では、要求と応答が 6 MB までなので、この流れのままでは大きなファイルを扱えません。関数 URL はバイナリを base64 にするので、実際に送れるファイルは約 4.5 MB です(推測)。さらに、CloudFront を通る要求の本文は 1 MB までです([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#the-6-mb-limit))。
+Lambda では、要求と応答が 6 MB までなので、この流れのままでは大きなファイルを扱えません。関数 URL はバイナリを base64 にするので、実際に送れるファイルは約 4.5 MB です(推測)。さらに、CloudFront を通る要求の本文は 1 MB までです([lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#the-6-mb-limit))。
 
 <a id="the-s3-plugin-used-as-a-reference"></a>
 
@@ -58,7 +58,7 @@ Redmine の S3 のプラグインは、どれも同じ考え方です。S3 の A
 
 ## バケットの構成
 
-バケットは 1 つです(この資料では `redmine-files` と書きます。インスタンスの名前が `redmine` のときの例で、本当の名前は [deploy-config.md](https://redmine-kit.github.io/redmine-serverless/ja/deploy-config.html#names-derived-from-the-instance-name) の決まりで作ります)。
+バケットは 1 つです(この資料では `redmine-files` と書きます。インスタンスの名前が `redmine` のときの例で、本当の名前は [deploy-config.md](https://redmine-kit.github.io/serverless/ja/deploy-config.html#names-derived-from-the-instance-name) の決まりで作ります)。
 
 | キー | 中身 | 消すとき |
 | --- | --- | --- |
@@ -114,7 +114,7 @@ sequenceDiagram
 - File API のないブラウザーのフォームの送信(1 MB まで)
 - メールで受けた添付ファイル(S3 から `redmine-task` が読むので、CloudFront と関数 URL の制限は当たらない)
 
-CloudFront を通る要求の本文は、本文のハッシュを入れる Lambda@Edge が読める 1 MB までです([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#the-6-mb-limit))。大きなファイルを API で送るときは、署名付きの POST での S3 へのアップロード(上の流れ。API キーと OAuth でも使える)を使います。
+CloudFront を通る要求の本文は、本文のハッシュを入れる Lambda@Edge が読める 1 MB までです([lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#the-6-mb-limit))。大きなファイルを API で送るときは、署名付きの POST での S3 へのアップロード(上の流れ。API キーと OAuth でも使える)を使います。
 
 これらは、Redmine の標準の `files_to_final_location` で `/tmp` のキャッシュ(下記)に書いたあと、S3 に PutObject します。PutObject が失敗したら、例外にしてレコードを保存しません。
 
@@ -179,7 +179,7 @@ sequenceDiagram
 
 - **上限:** `bulk_download_max_size` は、Redmine の既定(100 MB)のままにします。zip を作る時間が、`redmine-web` のタイムアウト(60 秒)に収まるかを測り、収まらなければ下げます。
 - **仮のファイルを消す:** `tmp/` の下は、ライフサイクルで 1 日後に消します。
-- **ほかの出力:** チケットの一覧の CSV や PDF、wiki の HTML などの出力は、Redmine から、そのまま返します。チケットの出力は既定で 500 件まで(`issues_export_limit`)で、ほかの出力も文字が中心で圧縮されるので、6 MB に届かない見込みです([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#the-6-mb-limit))。
+- **ほかの出力:** チケットの一覧の CSV や PDF、wiki の HTML などの出力は、Redmine から、そのまま返します。チケットの出力は既定で 500 件まで(`issues_export_limit`)で、ほかの出力も文字が中心で圧縮されるので、6 MB に届かない見込みです([lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#the-6-mb-limit))。
 - **作り直さない:** 同じ添付ファイルの組み合わせ(添付ファイルの ID と digest から作るキー)の zip が、まだ `tmp/bulk/` にあれば、作り直さずにリダイレクトします。
 - **ファイルがあるかの確認:** Redmine は、添付ファイルごとに `readable?` で確認します。この設計では `readable?` が S3 の HeadObject なので、添付ファイルの数だけ HeadObject を送ります(推測。数が多いと遅くなる。作るときに測る)。
 
@@ -196,7 +196,7 @@ Redmine の `attachments_storage_path` を `/tmp/redmine/files` にし、ここ�
   - 削除(`delete_from_disk!`)と、ファイルがあるかの確認(`readable?`)は、`diskfile` を通さないように差し替えます。消すだけのファイルや、確認するだけのファイルを取りに行かないためです。
 - **古くならない:** 添付ファイルは一度保存したら変わらないので、キャッシュを確認直す必要はありません。
 - **大きさ:** 関数の `/tmp` を 2,048 MB にし、1,536 MB を超えたら古いものから消します。環境が消えると、キャッシュも消えます。
-- **CSV のインポート:** インポートのファイルも、`/tmp/redmine/imports` に書いたあと `imports/` に PutObject し、読むときにローカルになければ S3 から取ります。`Import#filepath` は `Rails.root/tmp/imports` に固定されているので、イメージの `tmp` を `/tmp/redmine` へのシンボリックリンクにします([lambda.md](https://redmine-kit.github.io/redmine-serverless/ja/lambda.html#read-only-file-system))。
+- **CSV のインポート:** インポートのファイルも、`/tmp/redmine/imports` に書いたあと `imports/` に PutObject し、読むときにローカルになければ S3 から取ります。`Import#filepath` は `Rails.root/tmp/imports` に固定されているので、イメージの `tmp` を `/tmp/redmine` へのシンボリックリンクにします([lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#read-only-file-system))。
 - **Office のファイルのプレビューのキャッシュ:** Redmine は `files/derived_cache/` に置きます。`/tmp` のキャッシュの中に置き、S3 には置きません。環境ごとに作り直します。
 
 <a id="deletion"></a>
@@ -227,15 +227,15 @@ Redmine 本体のファイルは書き換えず、Redmine Serverless から `pre
 | `attachments.js` の `uploadBlob` | 署名付きの POST で S3 に送る | アップロード |
 | `Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?` | Lambda の上では、決めた値(空か無効)を返す。保存しても変えない | Lambda で使えない設定([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)) |
 
-- **有効にする条件:** S3 のバケットの設定(環境変数)があるときだけ、差し替えを有効にします。設定がなければ、Redmine の標準のままに動きます。Redmine 本体のテストを、そのまま通せるようにするためです([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#redmines-own-tests))。
-- **Redmine の更新:** Redmine のバージョンを上げるときは、差し替えた処理の元のコードが変わっていないかを確認します。差し替えの一覧は、この表を正とします。元のコードが変わったら、テストが失敗するようにします([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#redmines-own-tests))。
-- **テスト:** 差し替えた処理ごとに、Redmine のテストの仕組みでテストを書きます([testing.md](https://redmine-kit.github.io/redmine-serverless/ja/testing.html#attachments-in-s3))。
+- **有効にする条件:** S3 のバケットの設定(環境変数)があるときだけ、差し替えを有効にします。設定がなければ、Redmine の標準のままに動きます。Redmine 本体のテストを、そのまま通せるようにするためです([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#redmines-own-tests))。
+- **Redmine の更新:** Redmine のバージョンを上げるときは、差し替えた処理の元のコードが変わっていないかを確認します。差し替えの一覧は、この表を正とします。元のコードが変わったら、テストが失敗するようにします([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#redmines-own-tests))。
+- **テスト:** 差し替えた処理ごとに、Redmine のテストの仕組みでテストを書きます([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#attachments-in-s3))。
 
 <a id="permissions"></a>
 
 ## 権限
 
-`redmine-web`、`redmine-worker`、`redmine-task` の実行ロールに、添付ファイルのバケットのプレフィックスごとの読み書きを付けます。詳しくは [iam.md](https://redmine-kit.github.io/redmine-serverless/ja/iam.html) にあります。Lambda は VPC の外にあり、S3 の公開のエンドポイントに届きます。RDS の形では、VPC の中から S3 のゲートウェイエンドポイント(無料)を通ります([rds.md](https://redmine-kit.github.io/redmine-serverless/ja/rds.html#routes-out-of-the-vpc))。
+`redmine-web`、`redmine-worker`、`redmine-task` の実行ロールに、添付ファイルのバケットのプレフィックスごとの読み書きを付けます。詳しくは [iam.md](https://redmine-kit.github.io/serverless/ja/iam.html) にあります。Lambda は VPC の外にあり、S3 の公開のエンドポイントに届きます。RDS の形では、VPC の中から S3 のゲートウェイエンドポイント(無料)を通ります([rds.md](https://redmine-kit.github.io/serverless/ja/rds.html#routes-out-of-the-vpc))。
 
 <a id="to-verify"></a>
 

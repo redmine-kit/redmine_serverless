@@ -4,7 +4,7 @@ This is the design for storing Redmine attachments in S3. Uploads go directly fr
 
 It is built as a feature of Redmine Serverless, following the approach of the Redmine S3 plugins below. No external plugins are installed.
 
-The specifications in this document were checked against official information as of 2026-11-08 and the Redmine 7.0.3 source (d718d63 on 7.0-stable). Sources are in [sources.md](https://redmine-kit.github.io/redmine-serverless/sources.html).
+The specifications in this document were checked against official information as of 2026-11-08 and the Redmine 7.0.3 source (d718d63 on 7.0-stable). Sources are in [sources.md](https://redmine-kit.github.io/serverless/sources.html).
 
 ## How Redmine stores attachments
 
@@ -16,7 +16,7 @@ Redmine stores attachments on the local disk. It does not use Active Storage (lo
 - **Upload flow:** As soon as a file is selected, the browser sends the raw bytes to `POST /uploads.js` (`uploadBlob` in `app/assets/javascripts/attachments.js`). Redmine creates an attachment record not attached to anything and returns a token. When an issue or similar object is saved, the record is attached by the token.
 - **Download flow:** `AttachmentsController#download` checks permissions, then returns the file with `send_file`.
 
-On Lambda, requests and responses are limited to 6 MB, so this flow cannot handle large files as is. Function URLs base64-encode binary data, so the actual file size that can be sent is about 4.5 MB (estimate). In addition, request bodies through CloudFront are limited to 1 MB ([lambda.md](https://redmine-kit.github.io/redmine-serverless/lambda.html#the-6-mb-limit)).
+On Lambda, requests and responses are limited to 6 MB, so this flow cannot handle large files as is. Function URLs base64-encode binary data, so the actual file size that can be sent is about 4.5 MB (estimate). In addition, request bodies through CloudFront are limited to 1 MB ([lambda.md](https://redmine-kit.github.io/serverless/lambda.html#the-6-mb-limit)).
 
 ## The S3 plugin used as a reference
 
@@ -48,7 +48,7 @@ No plugin stating support for 7.0 was found in the range searched (GitHub, and a
 
 ## Bucket layout
 
-There is one bucket (written as `redmine-files` in this document; this is the example for the instance name `redmine`, and the real name follows the rules in [deploy-config.md](https://redmine-kit.github.io/redmine-serverless/deploy-config.html#names-derived-from-the-instance-name)).
+There is one bucket (written as `redmine-files` in this document; this is the example for the instance name `redmine`, and the real name follows the rules in [deploy-config.md](https://redmine-kit.github.io/serverless/deploy-config.html#names-derived-from-the-instance-name)).
 
 | Key | Contents | Deleted when |
 | --- | --- | --- |
@@ -100,7 +100,7 @@ On the following routes, the file reaches Rails.
 - Form submission from browsers without the File API (up to 1 MB)
 - Attachments in received mail (`redmine-task` reads them from S3, so the CloudFront and function URL limits do not apply)
 
-Request bodies through CloudFront are limited to 1 MB, which is what the Lambda@Edge function that adds the body hash can read ([lambda.md](https://redmine-kit.github.io/redmine-serverless/lambda.html#the-6-mb-limit)). To send large files through the API, use the upload to S3 with a presigned POST (the flow above; it also works with API keys and OAuth).
+Request bodies through CloudFront are limited to 1 MB, which is what the Lambda@Edge function that adds the body hash can read ([lambda.md](https://redmine-kit.github.io/serverless/lambda.html#the-6-mb-limit)). To send large files through the API, use the upload to S3 with a presigned POST (the flow above; it also works with API keys and OAuth).
 
 These files are written to the `/tmp` cache (below) by Redmine's standard `files_to_final_location`, then put to S3 with PutObject. If PutObject fails, an exception is raised and the record is not saved.
 
@@ -157,7 +157,7 @@ sequenceDiagram
 
 - **Limit:** `bulk_download_max_size` stays at Redmine's default (100 MB). Measure whether creating the zip fits within the `redmine-web` timeout (60 seconds), and lower the limit if it does not.
 - **Deleting temporary files:** Objects under `tmp/` are deleted by lifecycle after 1 day.
-- **Other exports:** Exports such as issue list CSV and PDF and wiki HTML are returned directly from Redmine. Issue exports are limited to 500 by default (`issues_export_limit`), and other exports are mostly text and compressed, so they are not expected to reach 6 MB ([lambda.md](https://redmine-kit.github.io/redmine-serverless/lambda.html#the-6-mb-limit)).
+- **Other exports:** Exports such as issue list CSV and PDF and wiki HTML are returned directly from Redmine. Issue exports are limited to 500 by default (`issues_export_limit`), and other exports are mostly text and compressed, so they are not expected to reach 6 MB ([lambda.md](https://redmine-kit.github.io/serverless/lambda.html#the-6-mb-limit)).
 - **No rebuilding:** If a zip for the same set of attachments (a key made from the attachment IDs and digests) is still in `tmp/bulk/`, redirect to it without rebuilding.
 - **Checking that files exist:** Redmine checks each attachment with `readable?`. In this design `readable?` is an S3 HeadObject, so one HeadObject is sent per attachment (estimate: slow with many attachments; to be measured when built).
 
@@ -172,7 +172,7 @@ Redmine's `attachments_storage_path` is set to `/tmp/redmine/files`, and this is
   - Deletion (`delete_from_disk!`) and the existence check (`readable?`) are replaced so they do not go through `diskfile`. This avoids fetching a file only to delete it or check it.
 - **Never stale:** Attachments never change once saved, so the cache does not need revalidation.
 - **Size:** The function's `/tmp` is 2,048 MB, and the oldest files are deleted when the cache exceeds 1,536 MB. When the environment goes away, so does the cache.
-- **CSV import:** Import files are also written to `/tmp/redmine/imports`, then put to `imports/` with PutObject, and fetched from S3 when read if they are not local. `Import#filepath` is fixed to `Rails.root/tmp/imports`, so `tmp` in the image is a symbolic link to `/tmp/redmine` ([lambda.md](https://redmine-kit.github.io/redmine-serverless/lambda.html#read-only-file-system)).
+- **CSV import:** Import files are also written to `/tmp/redmine/imports`, then put to `imports/` with PutObject, and fetched from S3 when read if they are not local. `Import#filepath` is fixed to `Rails.root/tmp/imports`, so `tmp` in the image is a symbolic link to `/tmp/redmine` ([lambda.md](https://redmine-kit.github.io/serverless/lambda.html#read-only-file-system)).
 - **Cache for Office file previews:** Redmine stores it in `files/derived_cache/`. It lives inside the `/tmp` cache, not in S3, and is rebuilt per environment.
 
 ## Deletion
@@ -199,13 +199,13 @@ Redmine's own files are not modified; Redmine Serverless replaces code with `pre
 | `uploadBlob` in `attachments.js` | Send to S3 with a presigned POST | Upload |
 | `Setting.enabled_scm`, `Setting.autofetch_changesets?`, `Setting.sys_api_enabled?`, `Setting.mail_handler_api_enabled?` | On Lambda, return fixed values (empty or disabled). Saving does not change them | Settings that cannot work on Lambda ([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)) |
 
-- **Enabling condition:** The replacements are enabled only when the S3 bucket is configured (environment variable). Without it, Redmine behaves as standard. This lets Redmine's own tests pass as is ([testing.md](https://redmine-kit.github.io/redmine-serverless/testing.html#redmines-own-tests)).
-- **Redmine upgrades:** When upgrading Redmine, check that the original code of the replaced methods has not changed. This table is the authoritative list of replacements. If the original code changes, a test must fail ([testing.md](https://redmine-kit.github.io/redmine-serverless/testing.html#redmines-own-tests)).
-- **Tests:** Each piece of replaced code gets tests written with Redmine's test framework ([testing.md](https://redmine-kit.github.io/redmine-serverless/testing.html#attachments-in-s3)).
+- **Enabling condition:** The replacements are enabled only when the S3 bucket is configured (environment variable). Without it, Redmine behaves as standard. This lets Redmine's own tests pass as is ([testing.md](https://redmine-kit.github.io/serverless/testing.html#redmines-own-tests)).
+- **Redmine upgrades:** When upgrading Redmine, check that the original code of the replaced methods has not changed. This table is the authoritative list of replacements. If the original code changes, a test must fail ([testing.md](https://redmine-kit.github.io/serverless/testing.html#redmines-own-tests)).
+- **Tests:** Each piece of replaced code gets tests written with Redmine's test framework ([testing.md](https://redmine-kit.github.io/serverless/testing.html#attachments-in-s3)).
 
 ## Permissions
 
-The execution roles of `redmine-web`, `redmine-worker` and `redmine-task` get read and write permissions per prefix of the attachment bucket. Details are in [iam.md](https://redmine-kit.github.io/redmine-serverless/iam.html). Lambda is outside a VPC and reaches the public S3 endpoint. In the RDS setup, traffic goes from inside the VPC through an S3 gateway endpoint (free) ([rds.md](https://redmine-kit.github.io/redmine-serverless/rds.html#routes-out-of-the-vpc)).
+The execution roles of `redmine-web`, `redmine-worker` and `redmine-task` get read and write permissions per prefix of the attachment bucket. Details are in [iam.md](https://redmine-kit.github.io/serverless/iam.html). Lambda is outside a VPC and reaches the public S3 endpoint. In the RDS setup, traffic goes from inside the VPC through an S3 gateway endpoint (free) ([rds.md](https://redmine-kit.github.io/serverless/rds.html#routes-out-of-the-vpc)).
 
 ## To verify
 
