@@ -17,4 +17,4 @@ Redmine を AWS のサーバーレスのサービスで動かすための Redmin
 
 ## ライセンス
 
-Redmine Serverless は、GNU General Public License バージョン 2 またはそれ以降のバージョンで公開しています。[LICENSE](LICENSE) を参照してください。Redmine のプロジェクトとは関係ありません。
+Redmine Serverless は、GNU General Public License バージョン 2 またはそれ以降のバージョンで公開しています。[LICENSE](LICENSE) を参照してください。Redmine projectとは関係ありません。
