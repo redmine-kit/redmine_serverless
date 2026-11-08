@@ -1,4 +1,4 @@
-# redmine_serverless
+# Redmine Serverless
 
 A Redmine plugin for running Redmine on AWS serverless services: attachments in S3, Redmine on Lambda, retries and import of mail through SES, email addresses per project, and administration pages for the AWS side. It is the plugin of [redmine-serverless](https://github.com/redmine-kit/redmine-serverless), and S3 attachments can also be used outside Lambda.
 
@@ -13,4 +13,4 @@ A Redmine plugin for running Redmine on AWS serverless services: attachments in 
 
 ## License
 
-redmine_serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](LICENSE). Not affiliated with the Redmine project.
+Redmine Serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](LICENSE). Not affiliated with the Redmine project.

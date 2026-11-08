@@ -2,7 +2,7 @@
 
 Redmine の添付ファイルを S3 に置く設計です。アップロードは、ブラウザーから S3 に直接送ります。ダウンロードは、Redmine が権限を確認してから、S3 の署名付き URL にリダイレクトします。ファイルの本体は Lambda を通りません。
 
-Redmine の S3 のプラグイン(下記)のやり方を参考に、自前のプラグイン `redmine_serverless` の機能として作ります。外部のプラグインは入れません。
+Redmine の S3 のプラグイン(下記)のやり方を参考に、Redmine Serverless の機能として作ります。外部のプラグインは入れません。
 
 この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソース(7.0-stable の d718d63)で確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
 
@@ -211,7 +211,7 @@ Redmine の `attachments_storage_path` を `/tmp/redmine/files` にし、ここ�
 
 ## 差し替える処理
 
-Redmine 本体のファイルは書き換えず、プラグイン `redmine_serverless` から `prepend` で差し替えます。足す画面(`/s3_uploads/presign`、`/s3_uploads/complete`)は、プラグインのルートとコントローラーに置きます。
+Redmine 本体のファイルは書き換えず、Redmine Serverless から `prepend` で差し替えます。足す画面(`/s3_uploads/presign`、`/s3_uploads/complete`)は、プラグインのルートとコントローラーに置きます。
 
 | 対象 | 差し替え | 理由 |
 | --- | --- | --- |

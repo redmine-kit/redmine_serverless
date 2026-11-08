@@ -1,6 +1,6 @@
 # 管理画面
 
-自前のプラグイン `redmine_serverless` が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
+Redmine Serverless が Redmine の管理のメニューに足す画面の設計です。画面の名前の「使う機能」は、プラグインの中の機能([プラグインの機能](README.md#features))です。使っていない機能の画面は出しません。メールの送信と受信、ジョブ、添付ファイルの S3、AWS への接続の状態を、Redmine の画面で確認し、操作できるようにします。
 
 この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/redmine-serverless/ja/sources.html) にあります。
 
@@ -65,7 +65,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | 添付ファイルサイズの上限(`attachment_max_size`) | 管理 › 設定 › ファイル | 変えられる。上限の目安の説明を足す | 画面からのアップロードは、登録のときの SHA256 の計算が 60 秒に収まる大きさまで。REST API の `POST /uploads.json` は 1 MB まで([attachments.md](attachments.md#upload)) |
 
 - **値を固定する:** プラグインが、上の設定の読み出し(`Setting.enabled_scm` など)を差し替えて、決めた値を返します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません。
-- **画面に表示する:** Redmine の設定の画面で、上の設定の入力を押せなくし、「サーバーレスの環境では使えません(redmine_serverless)」と添えます。画面のテンプレートは差し替えず、設定の画面を開いたときだけ、プラグインが小さな JavaScript を読み込んで表示を変えます(Redmine の標準のフック `view_layouts_base_html_head`)。JavaScript が動かなくても、値は上のとおり固定されているので、効き目は変わりません。
+- **画面に表示する:** Redmine の設定の画面で、上の設定の入力を押せなくし、「サーバーレスの環境では使えません(Redmine Serverless)」と添えます。画面のテンプレートは差し替えず、設定の画面を開いたときだけ、プラグインが小さな JavaScript を読み込んで表示を変えます(Redmine の標準のフック `view_layouts_base_html_head`)。JavaScript が動かなくても、値は上のとおり固定されているので、効き目は変わりません。
 - **プロジェクトのモジュール:** バージョン管理システムを選べないので、モジュールの「リポジトリ」を有効にしても、リポジトリは作れません。新しいプロジェクトの既定のモジュール(`default_projects_modules`)からは外しておきます(設定のファイルの `redmine.settings`。[deploy-config.md](https://redmine-kit.github.io/redmine-serverless/ja/deploy-config.html))。
 - **条件:** Lambda の上(`REDMINE_ROLE` があるとき)だけ固定します。手元のテストや、Lambda でない環境では、Redmine の標準のままです。
 - **管理画面の「情報」:** Redmine の標準の確認(ファイルの保存先に書き込めるか、ジョブのキューを既定から変えたか、ImageMagick、Ghostscript、Pandoc など)は、この設計で通る見込みです(保存先は `/tmp/redmine/files`、ジョブは `:sqs`)。

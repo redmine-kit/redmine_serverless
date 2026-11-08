@@ -2,7 +2,7 @@
 
 This is the design for storing Redmine attachments in S3. Uploads go directly from the browser to S3. For downloads, Redmine checks permissions, then redirects to an S3 presigned URL. File contents do not pass through Lambda.
 
-It is built as a feature of the project's own plugin `redmine_serverless`, following the approach of the Redmine S3 plugins below. No external plugins are installed.
+It is built as a feature of Redmine Serverless, following the approach of the Redmine S3 plugins below. No external plugins are installed.
 
 The specifications in this document were checked against official information as of 2026-11-08 and the Redmine 7.0.3 source (d718d63 on 7.0-stable). Sources are in [sources.md](https://redmine-kit.github.io/redmine-serverless/sources.html).
 
@@ -183,7 +183,7 @@ Redmine's `attachments_storage_path` is set to `/tmp/redmine/files`, and this is
 
 ## Replaced code
 
-Redmine's own files are not modified; the plugin `redmine_serverless` replaces code with `prepend`. The added endpoints (`/s3_uploads/presign`, `/s3_uploads/complete`) are in the plugin's routes and controller.
+Redmine's own files are not modified; Redmine Serverless replaces code with `prepend`. The added endpoints (`/s3_uploads/presign`, `/s3_uploads/complete`) are in the plugin's routes and controller.
 
 | Target | Replacement | Reason |
 | --- | --- | --- |

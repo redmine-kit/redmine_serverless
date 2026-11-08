@@ -4,7 +4,7 @@ Guidelines for people and coding agents working in this repository. See [README.
 
 ## What this project does
 
-`redmine_serverless` is a Redmine plugin for running Redmine on AWS serverless services. It is used by [redmine-serverless](https://github.com/redmine-kit/redmine-serverless), which runs Redmine on AWS Lambda. It is in the design stage: the repository holds the design documents.
+Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS serverless services. It is used by [redmine-serverless](https://github.com/redmine-kit/redmine-serverless), which runs Redmine on AWS Lambda. It is in the design stage: the repository holds the design documents.
 
 ## Rules
 
