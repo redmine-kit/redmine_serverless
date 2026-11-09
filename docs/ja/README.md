@@ -13,14 +13,14 @@ Redmine Serverless(`redmine_serverless`)は、Redmine を AWS Lambda で動か�
 
 Redmine の標準の動きをできるだけ保ち、自前で書くのは、Lambda で動かすのに要る部分だけにします。機能ごとに、有効にする条件を持たせます。条件がそろわない機能は、Redmine の標準のままに動きます。
 
-| 機能 | 中身 | 有効にする条件 | 資料 |
+| 機能 | 内容 | 有効にする条件 | 資料 |
 | --- | --- | --- | --- |
 | Lambda での実行 | Lambda Web Adapter の `/events` に 204 を返す Rack のミドルウェア、アセットの自動の書き出しを止める設定、Lambda で使えない Redmine の設定を無効に固定して画面に表示する | `REDMINE_ROLE` がある | [admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda) |
 | 管理画面 | 共有の「Serverless」のメニューの「状態と接続」のタブと、ほかのプラグインの確認 | 管理者 | [admin.md](admin.md) |
 
 AWS のためのほかの機能は、別のプラグインです。Lambda 以外でも動きます。
 
-| プラグイン | 中身 |
+| プラグイン | 内容 |
 | --- | --- |
 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/) | S3 の添付ファイル。署名付き URL で CloudFront を通すアップロードとダウンロード、`/tmp` のキャッシュ |
 | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/) | SES でのメール。エラーの種類ごとの送信のやり直し、受信と取り込み、プロジェクトごとのアドレス |
