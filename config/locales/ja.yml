@@ -1,0 +1,21 @@
+ja:
+  label_serverless_admin: Serverless
+  label_serverless_status: 状態と接続
+  label_serverless_function: 関数
+  label_serverless_versions: バージョン
+  label_serverless_loaded_settings: SSM Parameter Store から読み込んだ設定
+  label_serverless_fixed_settings: Lambda で固定している Redmine の設定
+  label_serverless_connection_check: 接続の確認
+  label_serverless_check_database: データベース
+  label_serverless_detail: 詳細
+  label_serverless_ok: OK
+  label_serverless_failed: 失敗
+  button_serverless_check: 接続を確認する
+  field_serverless_function_name: 関数の名前
+  field_serverless_function_role: 役割(REDMINE_ROLE)
+  field_serverless_function_version: 関数のバージョン
+  field_serverless_function_memory: メモリ(MB)
+  field_serverless_function_region: リージョン
+  field_serverless_function_image: イメージ
+  text_serverless_setting_fixed: サーバーレスの環境では使えません(Redmine Serverless)。
+  text_serverless_not_on_lambda: REDMINE_ROLE がないので、Redmine の設定は固定していません。
