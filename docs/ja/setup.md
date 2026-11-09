@@ -54,9 +54,9 @@ ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 
 ## 設定
 
-| 設定 | 場所 | 中身 |
+| キー | 説明 | パラメーター |
 | --- | --- | --- |
-| `REDMINE_ROLE` | 関数ごとの環境変数 | `web`、`worker`、`task`。Lambda のための機能を有効にする([README.md](README.md#features)) |
+| `REDMINE_ROLE` | Lambda のための機能を有効にする([README.md](README.md#features)) | Lambda では必須。関数ごとに `web`、`worker`、`task` のどれか。なければ機能は無効 |
 
 - **SSM の設定:** 起動のときに SSM Parameter Store から設定と秘密の値を読むには、[Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/ja/) を使います。それを入れると、「状態と接続」に、読んだパラメーターの名前が出ます。
 

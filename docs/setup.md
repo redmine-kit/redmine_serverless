@@ -46,9 +46,9 @@ ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 
 ## Configuration
 
-| Setting | Where | Contents |
+| Key | Description | Parameter |
 | --- | --- | --- |
-| `REDMINE_ROLE` | Environment variable of each function | `web`, `worker` or `task`. Turns on the features for Lambda ([README.md](README.md#features)) |
+| `REDMINE_ROLE` | Turns on the features for Lambda ([README.md](README.md#features)) | Required on Lambda. Per function: `web`, `worker` or `task`. Without it, the features stay off |
 
 - **Settings from SSM:** To read settings and secrets from SSM Parameter Store at start-up, use [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/). With it installed, "Status and connections" shows the names of the parameters read.
 
