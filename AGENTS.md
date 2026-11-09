@@ -20,7 +20,7 @@ Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmin
 - **Layout.** The READMEs stay short. The details go in `docs/`, published at https://redmine-kit.github.io/redmine_serverless/ with [redmine-kit/docs-skeleton](https://github.com/redmine-kit/docs-skeleton). Links to the documentation of Serverless are absolute GitHub URLs.
 - **Anchors in Japanese.** Put `<a id="..."></a>` with the English heading's anchor before each Japanese heading.
 - **Facts.** State only what has been checked, with the date and the source. Mark what has not been checked yet.
-- **Japanese wording.** Plain, precise Japanese. Keep established technical terms. Do not use "版" for a version, and write "通知" rather than "知らせ", and "確認" rather than "確かめ".
+- **Japanese wording.** Plain, precise Japanese. Keep established technical terms. Do not use "版" for a version, write "通知" rather than "知らせ", and "確認" rather than "確かめ".
 
 ## Commits
 
