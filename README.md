@@ -1,6 +1,8 @@
 # Redmine Serverless
 
-[![codecov](https://codecov.io/gh/redmine-kit/redmine_serverless/graph/badge.svg)](https://codecov.io/gh/redmine-kit/redmine_serverless)
+[![CI](https://img.shields.io/github/actions/workflow/status/redmine-kit/redmine_serverless/ci.yml?branch=main&label=CI)](https://github.com/redmine-kit/redmine_serverless/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/redmine-kit/redmine_serverless)](https://codecov.io/gh/redmine-kit/redmine_serverless)
+[![License](https://img.shields.io/github/license/redmine-kit/redmine_serverless)](LICENSE)
 
 A Redmine plugin for running Redmine on AWS Lambda: the Lambda Web Adapter `/events` endpoint, Redmine settings that cannot work on Lambda fixed and shown on screen, and the "Serverless" administration page with the status and connections of the AWS side. It is the plugin of [Serverless](https://github.com/redmine-kit/serverless). Attachments, email, jobs and settings from Parameter Store are the separate plugins [Redmine Serverless S3](https://github.com/redmine-kit/redmine_serverless_s3), [Redmine Serverless SES](https://github.com/redmine-kit/redmine_serverless_ses), [Redmine Serverless SQS](https://github.com/redmine-kit/redmine_serverless_sqs) and [Redmine Serverless SSM](https://github.com/redmine-kit/redmine_serverless_ssm).
 
