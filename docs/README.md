@@ -27,10 +27,11 @@ The other features for AWS are separate plugins, which also work outside Lambda:
 
 All of them put their administration pages under one "Serverless" item of Redmine's administration menu, as tabs of one page, whichever are installed ([admin.md](admin.md#the-serverless-menu)). With this plugin installed, their checks also join its connection check.
 
-- **Code structure:** `boot/redmine_serverless.rb` holds what must be in place before Rails initializes (the `/events` middleware and the asset setting); Bundler loads it, because the plugin is also a gem ([setup.md](setup.md#installation)). The rest is in `lib/redmine_serverless/` and `app/`, which Redmine loads, and `init.rb` turns it on.
-- **Gems:** The plugin calls no AWS API itself, so it needs no AWS SDK gem.
-- **Tests:** Tests are written for each piece of replaced code, using Redmine's standard mechanism (`rake redmine:plugins:test`) ([setup.md](setup.md#tests)).
-- **Migrations:** None.
+## Code layout
+
+What must be in place before Rails initializes (the `/events` middleware and the asset setting) is in `boot/redmine_serverless.rb`. Because the plugin is also a gem, Bundler loads this file ([setup.md](setup.md#installation)). The rest is in `lib/redmine_serverless/` and `app/`, which Redmine loads, and `init.rb` turns it on.
+
+The plugin calls no AWS API itself, so it needs no AWS SDK gem. It adds no database tables, so there are no migrations to run. Each piece of replaced code has tests written with Redmine's standard mechanism (`rake redmine:plugins:test`) ([setup.md](setup.md#tests)).
 
 ## Running on Lambda
 

@@ -29,10 +29,13 @@ AWS のためのほかの機能は、別のプラグインです。Lambda 以外
 
 どのプラグインも、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に、1 つのページのタブとして置きます([admin.md](admin.md#the-serverless-menu))。このプラグインをインストールしているときは、それぞれの確認が、接続の確認にも加わります。
 
-- **コードの分け方:** Rails の初期化より前に要るもの(`/events` のミドルウェアとアセットの設定)は `boot/redmine_serverless.rb` にあり、Bundler が読み込みます。プラグインは gem でもあるからです([setup.md](setup.md#installation))。ほかは Redmine が読み込む `lib/redmine_serverless/` と `app/` にあり、`init.rb` が有効にします。
-- **gem:** プラグインは自分では AWS の API を呼ばないので、AWS の SDK の gem は要りません。
-- **テスト:** Redmine の標準の仕組み(`rake redmine:plugins:test`)で、差し替えた処理ごとにテストを書きます([setup.md](setup.md#tests))。
-- **migration:** ありません。
+<a id="code-layout"></a>
+
+## コードの構成
+
+Rails の初期化より前に要るもの(`/events` のミドルウェアとアセットの設定)は、`boot/redmine_serverless.rb` にあります。プラグインは gem でもあるので、Bundler がこのファイルを読み込みます([setup.md](setup.md#installation))。ほかは Redmine が読み込む `lib/redmine_serverless/` と `app/` にあり、`init.rb` が有効にします。
+
+プラグインは自分では AWS の API を呼ばないので、AWS SDK の gem は要りません。データベースのテーブルも足さないので、実行する migration はありません。差し替えた処理ごとに、Redmine の標準の仕組み(`rake redmine:plugins:test`)でテストを書いています([setup.md](setup.md#tests))。
 
 <a id="running-on-lambda"></a>
 
