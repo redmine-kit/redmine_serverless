@@ -9,13 +9,22 @@ What a Redmine needs to use Redmine Serverless: installation, configuration, the
 
 ## Installation
 
-**Getting the plugin:** with Docker, copy it from the plugin's image on ghcr.io, pinned by digest (tags: `main` and `sha-<commit>` for every push to `main`, `v*` for releases):
+**Getting the plugin:** Each version tag publishes the plugin as a gem to GitHub Packages (`https://rubygems.pkg.github.com/redmine-kit`). No version is published yet. Installing from GitHub Packages needs a GitHub token with `read:packages`, even for a public package. The gem holds the plugin's run-time files; Redmine loads plugins only from `plugins/`, so the installed gem is linked there:
 
-```dockerfile
-COPY --from=ghcr.io/redmine-kit/redmine_serverless:main@sha256:<digest> /redmine_serverless plugins/redmine_serverless/
+```ruby
+# Redmine's Gemfile.local
+source 'https://rubygems.pkg.github.com/redmine-kit' do
+  gem 'redmine_serverless'
+end
 ```
 
-Without Docker, clone the repository (`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`) or, once releases are published, extract a release archive into `plugins/redmine_serverless`.
+```sh
+bundle config set --global rubygems.pkg.github.com <user>:<token>   # or the variable BUNDLE_RUBYGEMS__PKG__GITHUB__COM
+bundle install
+ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
+```
+
+Without the gem, clone the repository into `plugins/redmine_serverless` (`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`).
 
 1. Put the plugin in `plugins/redmine_serverless` and run `bundle install` (the plugin's `Gemfile` is loaded by Redmine's).
 2. No migration is needed.
