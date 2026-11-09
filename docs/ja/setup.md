@@ -13,6 +13,14 @@ Redmine Serverless を使う Redmine に要るもの(インストール、設定
 
 ## インストール
 
+**プラグインの取り方:** Docker なら、ghcr.io のプラグインのイメージから、digest で固定して写します(タグは、`main` への push のたびに `main` と `sha-<コミット>`、リリースは `v*`)。
+
+```dockerfile
+COPY --from=ghcr.io/redmine-kit/redmine_serverless:main@sha256:<digest> /redmine_serverless plugins/redmine_serverless/
+```
+
+Docker を使わないなら、リポジトリを clone するか(`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`)、リリースを公開したあとは、そのアーカイブを `plugins/redmine_serverless` に展開します。
+
 1. プラグインを `plugins/redmine_serverless` に置き、`bundle install` を実行します(プラグインの `Gemfile` は、Redmine の `Gemfile` が読み込みます)。
 2. migration は要りません。
 

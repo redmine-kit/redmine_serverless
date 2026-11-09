@@ -9,6 +9,14 @@ What a Redmine needs to use Redmine Serverless: installation, configuration, the
 
 ## Installation
 
+**Getting the plugin:** with Docker, copy it from the plugin's image on ghcr.io, pinned by digest (tags: `main` and `sha-<commit>` for every push to `main`, `v*` for releases):
+
+```dockerfile
+COPY --from=ghcr.io/redmine-kit/redmine_serverless:main@sha256:<digest> /redmine_serverless plugins/redmine_serverless/
+```
+
+Without Docker, clone the repository (`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`) or, once releases are published, extract a release archive into `plugins/redmine_serverless`.
+
 1. Put the plugin in `plugins/redmine_serverless` and run `bundle install` (the plugin's `Gemfile` is loaded by Redmine's).
 2. No migration is needed.
 
