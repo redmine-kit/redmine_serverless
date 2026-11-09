@@ -4,7 +4,7 @@ A Redmine plugin for running Redmine on AWS Lambda: the Lambda Web Adapter `/eve
 
 [日本語](README.ja.md)
 
-> **Status:** design stage. The repository holds the design documents; nothing is implemented yet.
+> **Status:** early development. The `/events` middleware, the fixed settings and the "Serverless" administration page are implemented and tested on Redmine 7.0.3.
 
 ## Documentation
 

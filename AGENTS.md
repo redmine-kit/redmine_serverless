@@ -4,14 +4,16 @@ Guidelines for people and coding agents working in this repository. See [README.
 
 ## What this project does
 
-Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. It is used by [Serverless](https://github.com/redmine-kit/serverless), which runs Redmine on AWS Lambda. Attachments, email, jobs and settings from Parameter Store are separate plugins ([redmine_serverless_s3](https://github.com/redmine-kit/redmine_serverless_s3), [redmine_serverless_ses](https://github.com/redmine-kit/redmine_serverless_ses), [redmine_serverless_sqs](https://github.com/redmine-kit/redmine_serverless_sqs), [redmine_serverless_ssm](https://github.com/redmine-kit/redmine_serverless_ssm)). It is in the design stage: the repository holds the design documents.
+Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. It is used by [Serverless](https://github.com/redmine-kit/serverless), which runs Redmine on AWS Lambda. Attachments, email, jobs and settings from Parameter Store are separate plugins ([redmine_serverless_s3](https://github.com/redmine-kit/redmine_serverless_s3), [redmine_serverless_ses](https://github.com/redmine-kit/redmine_serverless_ses), [redmine_serverless_sqs](https://github.com/redmine-kit/redmine_serverless_sqs), [redmine_serverless_ssm](https://github.com/redmine-kit/redmine_serverless_ssm)). It is in early development.
 
 ## Rules
 
 - **Redmine's extension points only:** do not edit Redmine's own files. Keep Redmine's standard behaviour wherever possible, and write only what running serverless needs.
 - **Features can be turned on separately:** each feature has the condition that turns it on; without it, Redmine behaves as standard.
 - **Replaced code:** the plugin replaces only the readers of the settings that cannot work on Lambda ([admin.md](docs/admin.md#redmine-settings-that-cannot-work-on-lambda)). When Redmine is upgraded, check that the original code has not changed.
-- **Tests:** replaced and added code has tests, run with Redmine's own mechanism (`rake redmine:plugins:test`). The test plan is in Serverless ([testing.md](https://github.com/redmine-kit/serverless/blob/main/docs/testing.md#plugin-tests)).
+- **Tests:** replaced and added code has tests, run with Redmine's own mechanism (`bin/test` runs them in Docker; [setup.md](docs/setup.md#tests)). The test plan is in Serverless ([testing.md](https://github.com/redmine-kit/serverless/blob/main/docs/testing.md#plugin-tests)).
+- **Code layout:** `boot/` holds what must be in place before Rails initializes (Bundler loads it; module `RedmineServerlessBoot`), `lib/` and `app/` the rest (Redmine autoloads them; `init.rb` calls `RedmineServerless.setup`).
+- **Shared files:** `lib/redmine_serverless_admin.rb`, `app/controllers/serverless_admin_controller.rb` and `app/views/serverless_admin/_tabs.html.erb` are the same in every Redmine Serverless plugin. Change them in all plugins together and raise `SHARED_VERSION`.
 - **No secrets in the repository.**
 
 ## Documentation

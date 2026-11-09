@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. [Serverless](https://redmine-kit.github.io/serverless/architecture.html) installs it in the Lambda image. It does not modify Redmine's own files and uses only Redmine's standard extension mechanisms. The plugin is in the design stage, and only the documentation exists.
+Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. [Serverless](https://redmine-kit.github.io/serverless/architecture.html) installs it in the Lambda image. It does not modify Redmine's own files and uses only Redmine's standard extension mechanisms. The plugin is in early development (version 0.1.0).
 
 - [Setup](setup.md): requirements, installation, configuration, AWS resources, network, tests
 - [IAM permissions](iam.md): permissions, example policy, resource-based policies
@@ -26,7 +26,7 @@ The other features for AWS are separate plugins, which also work outside Lambda:
 
 All of them put their administration pages under one "Serverless" item of Redmine's administration menu, as tabs of one page, whichever are installed ([admin.md](admin.md#the-serverless-menu)). With this plugin installed, their checks also join its connection check.
 
-- **Code structure:** Inside the plugin, each feature has its own directory (under `lib/redmine_serverless/`), and features connect to each other only through defined entry points.
+- **Code structure:** `boot/redmine_serverless.rb` holds what must be in place before Rails initializes (the `/events` middleware and the asset setting); Bundler loads it, because the plugin is also a gem ([setup.md](setup.md#installation)). The rest is in `lib/redmine_serverless/` and `app/`, which Redmine loads, and `init.rb` turns it on.
 - **Gems:** The plugin calls no AWS API itself, so it needs no AWS SDK gem.
 - **Tests:** Tests are written for each piece of replaced code, using Redmine's standard mechanism (`rake redmine:plugins:test`) ([setup.md](setup.md#tests)).
 - **Migrations:** None.

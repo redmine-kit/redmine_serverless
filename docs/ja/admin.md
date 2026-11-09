@@ -1,6 +1,6 @@
 # 管理画面
 
-すべての Redmine Serverless のプラグインが共有する、Redmine の管理のメニューの「Serverless」の項目と、そこに Redmine Serverless が置く画面の設計です。使っていない機能の画面は出しません。AWS への接続の状態を、Redmine の画面で確認できるようにします。[Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/admin.html)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/admin.html)、[Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/admin.html) を入れると、それぞれの画面がここのタブに加わります。
+すべての Redmine Serverless のプラグインが共有する、Redmine の管理のメニューの「Serverless」の項目と、そこに Redmine Serverless が置く画面です。使っていない機能の画面は出しません。AWS への接続の状態を、Redmine の画面で確認できるようにします。[Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/admin.html)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/admin.html)、[Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/admin.html) を入れると、それぞれの画面がここのタブに加わります。
 
 この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/serverless/ja/sources.html) にあります。
 
@@ -10,7 +10,7 @@
 
 - **管理者だけ:** どの画面も、Redmine の管理者だけが開けます。Redmine の管理の画面と同じ確認(`require_admin`)を使います。
 - **秘密の値は出さない:** SSM Parameter Store の値、`SECRET_KEY_BASE`、データベースのパスワードは、画面に出しません。パラメーターの名前と、読めたかどうかだけを出します。
-- **AWS の API は必要なときだけ呼ぶ:** 画面を開いただけで多くの API を呼ばないよう、状態は 1 分だけキャッシュし、重い確認はボタンを押したときにジョブで行います。
+- **AWS の API は必要なときだけ呼ぶ:** 画面を開いただけで多くの API を呼ばないよう、状態は 1 分だけキャッシュし、接続の確認はボタンを押したときだけ行います(サービスごとに軽い呼び出しを 1 回、その要求の中で)。
 - **秘密でない設定は画面で変える:** 秘密でない設定は、プラグインの設定(Redmine の `Setting.plugin_*`、データベースに入る)にし、画面で変えられるようにします。AWS のリソースの名前など、インフラで決まる値は、環境変数のまま表示だけします。
 - **操作は記録する:** 画面での操作は、Redmine のログに、誰がいつ何をしたかを残します。
 
@@ -31,10 +31,10 @@
 
 Redmine Serverless のプラグインは、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に置きます。画面は、1 つのページのタブになります。
 
-- **項目は 1 つ:** 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを足し、ほかのプラグインはタブだけを足します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ足します(`Redmine::MenuManager.items(:admin_menu)`)。具体的なしくみ(たとえば、どのプラグインにも同じ小さな共有の部品を持たせ、まだ定義されていないときだけ定義する)は、コードを書くときに決めます。
+- **項目は 1 つ:** 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを足し、ほかのプラグインはタブだけを足します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ足します(`Redmine::MenuManager.items(:admin_menu)`)。どのプラグインも、同じ 3 つのファイルを持ちます。登録先の `RedmineServerlessAdmin`(`lib/redmine_serverless_admin.rb`)、コントローラーの `ServerlessAdminController`、ビューの `serverless_admin/_tabs` です。Redmine のコードの読み込みとビューのパスは、最初に見つけたものを使い、ほかは使わないので、どのコピーも同じにしておきます(`SHARED_VERSION`)。各プラグインは、`init.rb` で、そこに自分のタブと接続の確認を登録します(`register_tab`、`register_check`)。最初の登録が、メニューの項目を足します。項目は `/admin/serverless` を開き、そこから最初のタブに移ります。
 - **タブの並び:** 状態と接続、ジョブ、メールの送信、メールの受信、添付ファイルの S3。タブは、そのプラグインをインストールしているときだけ出ます。
 - **このプラグインがないとき:** 「状態と接続」のタブは出ず、ほかのプラグインのタブは「Serverless」の下に出ます。たとえば、Redmine Serverless S3 だけをインストールした Redmine では、「Serverless」の項目に「添付ファイルの S3」のタブが 1 つだけ出ます。
-- **プラグインの一覧から:** プラグインの一覧で各プラグインの「設定」を開くと、そのプラグインのタブが開きます。
+- **プラグインの一覧から:** プラグインは、Redmine のプラグインの設定の画面を持たないので、プラグインの一覧に「設定」のリンクは出ません。設定は、それぞれのタブにあります。
 - **プロジェクトの設定:** Redmine Serverless SES がプロジェクトの設定に足す「メール」のタブは、このメニューには含めません。
 
 <a id="status-and-connections"></a>
@@ -90,4 +90,4 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 
 ## テスト
 
-画面ごとに、Redmine の機能のテストとシステムのテストを書きます([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#administration-pages))。
+画面ごとに、Redmine の機能のテストがあります([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#administration-pages))。

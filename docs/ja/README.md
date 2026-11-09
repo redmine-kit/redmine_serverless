@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-Redmine Serverless(`redmine_serverless`)は、Redmine を AWS Lambda で動かすための Redmine のプラグインです。[Serverless](https://redmine-kit.github.io/serverless/ja/architecture.html) が、Lambda 用のイメージに入れて使います。Redmine 本体のファイルは書き換えず、Redmine の標準の拡張の仕組みだけで作ります。今は設計段階で、資料だけがあります。
+Redmine Serverless(`redmine_serverless`)は、Redmine を AWS Lambda で動かすための Redmine のプラグインです。[Serverless](https://redmine-kit.github.io/serverless/ja/architecture.html) が、Lambda 用のイメージに入れて使います。Redmine 本体のファイルは書き換えず、Redmine の標準の拡張の仕組みだけで作ります。今は開発の初期です(バージョン 0.1.0)。
 
 - [準備](setup.md): 前提、インストール、設定、AWS のリソース、ネットワーク、テスト
 - [IAM の権限](iam.md): 権限、例のポリシー、リソースベースのポリシー
@@ -28,7 +28,7 @@ AWS のためのほかの機能は、別のプラグインです。Lambda 以外
 
 どのプラグインも、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に、1 つのページのタブとして置きます([admin.md](admin.md#the-serverless-menu))。このプラグインをインストールしているときは、それぞれの確認が、接続の確認にも加わります。
 
-- **コードの分け方:** プラグインの中で、機能ごとにディレクトリ(`lib/redmine_serverless/` の下)を分け、機能どうしは、決めた入口だけでつなぎます。
+- **コードの分け方:** Rails の初期化より前に要るもの(`/events` のミドルウェアとアセットの設定)は `boot/redmine_serverless.rb` にあり、Bundler が読み込みます。プラグインは gem でもあるからです([setup.md](setup.md#installation))。ほかは Redmine が読み込む `lib/redmine_serverless/` と `app/` にあり、`init.rb` が有効にします。
 - **gem:** プラグインは自分では AWS の API を呼ばないので、AWS の SDK の gem は要りません。
 - **テスト:** Redmine の標準の仕組み(`rake redmine:plugins:test`)で、差し替えた処理ごとにテストを書きます([setup.md](setup.md#tests))。
 - **migration:** ありません。

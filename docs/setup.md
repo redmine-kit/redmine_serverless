@@ -1,6 +1,6 @@
 # Setup
 
-What a Redmine needs to use Redmine Serverless: installation, configuration, the AWS resources it expects, IAM permissions and network access. [Serverless](https://redmine-kit.github.io/serverless/) sets all of this up with CloudFormation; this page is for setting it up by hand, or for checking what Serverless creates. The plugin is in the design stage, so the details below are the design and are checked when the code is written.
+What a Redmine needs to use Redmine Serverless: installation, configuration, the AWS resources it expects, IAM permissions and network access. [Serverless](https://redmine-kit.github.io/serverless/) sets all of this up with CloudFormation; this page is for setting it up by hand, or for checking what Serverless creates.
 
 ## Requirements
 
@@ -9,7 +9,19 @@ What a Redmine needs to use Redmine Serverless: installation, configuration, the
 
 ## Installation
 
-**Getting the plugin:** Each version tag publishes the plugin as a gem to GitHub Packages (`https://rubygems.pkg.github.com/redmine-kit`). No version is published yet. Installing from GitHub Packages needs a GitHub token with `read:packages`, even for a public package. The gem holds the plugin's run-time files; Redmine loads plugins only from `plugins/`, so the installed gem is linked there:
+1. Get the plugin into `plugins/redmine_serverless` of Redmine 7.0: the gem below, or a checkout of this repository.
+2. Add the plugin to `Gemfile.local` as a gem, and run `bundle install`. Bundler then loads `boot/redmine_serverless.rb` before Rails initializes: the `/events` middleware and the asset setting must be in place by then, and Redmine's own loading of plugins (`init.rb`) comes too late for them. With a checkout, add it by path:
+
+   ```ruby
+   # Redmine's Gemfile.local
+   gem 'redmine_serverless', path: 'plugins/redmine_serverless'
+   ```
+
+3. No migration is needed.
+
+### Gem
+
+Each version tag (`v*`) publishes the plugin as a gem to GitHub Packages (`https://rubygems.pkg.github.com/redmine-kit`; `.github/workflows/gem.yml`). The gem holds the run-time files (`init.rb`, `boot/`, `lib/`, `app/`, `config/`, `LICENSE`); the plugin's `Gemfile` is not in it. Redmine loads plugins only from `plugins/`, so the installed gem is linked there:
 
 ```ruby
 # Redmine's Gemfile.local
@@ -19,15 +31,12 @@ end
 ```
 
 ```sh
-bundle config set --global rubygems.pkg.github.com <user>:<token>   # or the variable BUNDLE_RUBYGEMS__PKG__GITHUB__COM
+bundle config set --global rubygems.pkg.github.com <user>:<token>   # or BUNDLE_RUBYGEMS__PKG__GITHUB__COM
 bundle install
 ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 ```
 
-Without the gem, clone the repository into `plugins/redmine_serverless` (`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`).
-
-1. Put the plugin in `plugins/redmine_serverless` and run `bundle install` (the plugin's `Gemfile` is loaded by Redmine's).
-2. No migration is needed.
+- **Access:** installing from GitHub Packages needs a GitHub token with `read:packages`, even for a public package. A workflow of another repository reads it with its `GITHUB_TOKEN` (`packages: read`) once the package's settings ("Manage Actions access") give that repository Read.
 
 ## Configuration
 
@@ -55,8 +64,15 @@ The permissions the plugin needs, with an example policy, are in [iam.md](iam.md
 
 ## Tests
 
-Redmine's standard plugin tests (`bin/rake redmine:plugins:test NAME=redmine_serverless`). Serverless runs them with its scripts, which take a local checkout of this plugin with `REDMINE_SERVERLESS_DIR` ([Serverless testing.md](https://redmine-kit.github.io/serverless/testing.html#running-on-lambda-redmine_serverless)).
+The tests are in `test/` and run with Redmine's standard mechanism, in Redmine 7.0.3 on PostgreSQL 16 in Docker. `bin/test` runs the plugin's tests, then Redmine's own tests around the replaced code (settings, repositories, `sys`, incoming email, administration); `bin/test --redmine` runs every Redmine test with the plugin installed, as the CI does. Serverless also runs the plugin's tests in its image ([Serverless testing.md](https://redmine-kit.github.io/serverless/testing.html#running-on-lambda-redmine_serverless)).
+
+```sh
+bin/test            # the plugin's tests and Redmine's tests around them
+bin/test --redmine  # with every Redmine test
+bin/lint            # RuboCop
+bin/services --down # stops PostgreSQL
+```
 
 ## To verify
 
-- Whether Redmine's settings page can be changed through the hook `view_layouts_base_html_head` alone, without replacing templates ([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))
+- Nothing for now. Checked on 2026-11-09 with Redmine 7.0.3: the hook `view_layouts_base_html_head` alone disables the inputs on the settings page, without replacing templates ([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)).

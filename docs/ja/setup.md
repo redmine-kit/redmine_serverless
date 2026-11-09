@@ -1,6 +1,6 @@
 # 準備
 
-Redmine Serverless を使う Redmine に要るもの(インストール、設定、前提にする AWS のリソース、IAM の権限、ネットワーク)です。[Serverless](https://redmine-kit.github.io/serverless/ja/) は、これらをすべて CloudFormation で作ります。このページは、手で用意するときや、Serverless が作るものを確認するときのためのものです。プラグインは設計段階なので、下の内容は設計で、コードを書くときに確認します。
+Redmine Serverless を使う Redmine に要るもの(インストール、設定、前提にする AWS のリソース、IAM の権限、ネットワーク)です。[Serverless](https://redmine-kit.github.io/serverless/ja/) は、これらをすべて CloudFormation で作ります。このページは、手で用意するときや、Serverless が作るものを確認するときのためのものです。
 
 <a id="requirements"></a>
 
@@ -13,7 +13,21 @@ Redmine Serverless を使う Redmine に要るもの(インストール、設定
 
 ## インストール
 
-**プラグインの取り方:** バージョンのタグごとに、プラグインを gem として GitHub Packages(`https://rubygems.pkg.github.com/redmine-kit`)に公開します。まだどのバージョンも公開していません。GitHub Packages から入れるには、公開のパッケージでも、`read:packages` の権限を持つ GitHub のトークンが要ります。gem はプラグインの動かすためのファイルを持ちます。Redmine は `plugins/` のプラグインだけを読み込むので、入れた gem をそこにリンクします。
+1. プラグインを、Redmine 7.0 の `plugins/redmine_serverless` に置きます。下の gem か、このリポジトリのチェックアウトです。
+2. プラグインを gem として `Gemfile.local` に足し、`bundle install` を実行します。こうすると、Bundler が、Rails の初期化より前に `boot/redmine_serverless.rb` を読み込みます。`/events` のミドルウェアとアセットの設定は、そのときまでに要り、Redmine がプラグインを読み込む(`init.rb`)のでは遅すぎるからです。チェックアウトなら、パスで足します。
+
+   ```ruby
+   # Redmine の Gemfile.local
+   gem 'redmine_serverless', path: 'plugins/redmine_serverless'
+   ```
+
+3. migration は要りません。
+
+<a id="gem"></a>
+
+### gem
+
+バージョンのタグ(`v*`)ごとに、プラグインを gem として GitHub Packages(`https://rubygems.pkg.github.com/redmine-kit`)に公開します(`.github/workflows/gem.yml`)。gem は、動かすためのファイル(`init.rb`、`boot/`、`lib/`、`app/`、`config/`、`LICENSE`)を持ちます。プラグインの `Gemfile` は入れません。Redmine は `plugins/` のプラグインだけを読み込むので、インストールした gem をそこにリンクします。
 
 ```ruby
 # Redmine の Gemfile.local
@@ -28,10 +42,7 @@ bundle install
 ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 ```
 
-gem を使わないなら、リポジトリを `plugins/redmine_serverless` に clone します(`git clone https://github.com/redmine-kit/redmine_serverless.git plugins/redmine_serverless`)。
-
-1. プラグインを `plugins/redmine_serverless` に置き、`bundle install` を実行します(プラグインの `Gemfile` は、Redmine の `Gemfile` が読み込みます)。
-2. migration は要りません。
+- **アクセス:** GitHub Packages からインストールするには、公開のパッケージでも、`read:packages` の権限を持つ GitHub のトークンが要ります。ほかのリポジトリのワークフローは、パッケージの設定(「Manage Actions access」)でそのリポジトリに Read を与えると、自分の `GITHUB_TOKEN`(`packages: read`)で読めます。
 
 <a id="configuration"></a>
 
@@ -69,10 +80,17 @@ gem を使わないなら、リポジトリを `plugins/redmine_serverless` に 
 
 ## テスト
 
-Redmine の標準のプラグインのテストです(`bin/rake redmine:plugins:test NAME=redmine_serverless`)。Serverless が、自分のスクリプトで実行します。スクリプトは、`REDMINE_SERVERLESS_DIR` で、手元のこのプラグインのチェックアウトを使えます([Serverless の testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#running-on-lambda-redmine_serverless))。
+テストは `test/` にあり、Redmine の標準のしくみで、Docker の中の Redmine 7.0.3 と PostgreSQL 16 で動かします。`bin/test` は、プラグインのテストのあと、差し替えたコードのまわりの Redmine 本体のテスト(設定、リポジトリ、`sys`、メールの受信、管理)を動かします。`bin/test --redmine` は、プラグインを入れた状態で Redmine 本体のすべてのテストを動かします。CI はこちらです。Serverless も、自分のイメージでプラグインのテストを動かします([Serverless の testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#running-on-lambda-redmine_serverless))。
+
+```sh
+bin/test            # プラグインのテストと、そのまわりの Redmine のテスト
+bin/test --redmine  # Redmine のすべてのテストも
+bin/lint            # RuboCop
+bin/services --down # PostgreSQL を止める
+```
 
 <a id="to-verify"></a>
 
 ## 確認すること
 
-- テンプレートを差し替えずに、フック `view_layouts_base_html_head` だけで、Redmine の設定の画面を変えられるか([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))
+- 今はありません。2026-11-09 に Redmine 7.0.3 で確認しました。テンプレートを差し替えずに、フック `view_layouts_base_html_head` だけで、設定の画面の入力を無効にできます([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))。
