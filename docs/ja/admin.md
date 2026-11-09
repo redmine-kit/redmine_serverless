@@ -74,7 +74,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 | リポジトリ管理用のWebサービスを有効にする(`sys_api_enabled`) | 同上 | 無効に固定する | 同上 |
 | 受信メール用のWebサービスを有効にする(`mail_handler_api_enabled`) | 管理 › 設定 › 受信メール | 無効に固定する | メールは SES で受けて `redmine-task` が取り込む([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#receiving)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/))。外から HTTP でメールを送り込める Web サービスを開けない |
 
-- **値を固定する:** プラグインが、上の設定の読み出し(`Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?`)を差し替えて、決めた値を返します。プラグインが Redmine の処理を差し替えるのはここだけです。Redmine を上げるときは、これらの読み出しが変わっていないかを確認します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません。
+- **値を固定する:** プラグインが、上の設定の読み出し(`Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?`)を差し替えて、決めた値を返します。プラグインが Redmine の処理を差し替えるのはここだけです。Redmine のバージョンアップでは、これらの読み出しが変わっていないかを確認します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません。
 - **画面に表示する:** Redmine の設定の画面で、上の設定の入力を押せなくし、「サーバーレスの環境では使えません(Redmine Serverless)」と添えます。画面のテンプレートは差し替えず、設定の画面を開いたときだけ、プラグインが小さな JavaScript を読み込んで表示を変えます(Redmine の標準のフック `view_layouts_base_html_head`)。JavaScript が動かなくても、値は上のとおり固定されているので、効き目は変わりません。
 - **プロジェクトのモジュール:** バージョン管理システムを選べないので、モジュールの「リポジトリ」を有効にしても、リポジトリは作れません。新しいプロジェクトの既定のモジュール(`default_projects_modules`)からは外しておきます(設定のファイルの `redmine.settings`。[deploy-config.md](https://redmine-kit.github.io/serverless/ja/deploy-config.html))。
 - **条件:** Lambda の上(`REDMINE_ROLE` があるとき)だけ固定します。手元のテストや、Lambda 以外の環境では、Redmine の標準のままです。
