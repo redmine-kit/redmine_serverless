@@ -75,7 +75,7 @@ Standard Redmine settings that do not work on Lambda, or that this design does n
 
 ## Permissions
 
-For these pages, the execution role of `redmine-web` gets permissions to read SQS queue counts and to redrive the dead-letter queue. Details are in [iam.md](https://redmine-kit.github.io/serverless/iam.html).
+For these pages, the role of web requests gets permissions to read SQS queue counts, to resend jobs and to redrive the dead-letter queue. The list and an example policy are in [setup.md](setup.md#iam-permissions).
 
 ## Tests
 

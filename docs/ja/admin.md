@@ -87,7 +87,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 
 ## 権限
 
-画面のために、`redmine-web` の実行ロールに、SQS のキューの件数を読む権限と、デッドレターキューを戻す権限を足します。詳しくは [iam.md](https://redmine-kit.github.io/serverless/ja/iam.html) にあります。
+画面のために、画面の要求のロールに、SQS のキューの件数を読む権限、ジョブを送り直す権限、デッドレターキューを戻す権限を足します。一覧とポリシーの例は [setup.md](setup.md#iam-permissions) にあります。
 
 <a id="tests"></a>
 
