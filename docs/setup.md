@@ -42,7 +42,7 @@ bundle install
 ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 ```
 
-- **Access:** installing from GitHub Packages needs a GitHub token with `read:packages`, even for a public package. A workflow of another repository reads it with its `GITHUB_TOKEN` (`packages: read`) once the package's settings ("Manage Actions access") give that repository Read.
+Installing from GitHub Packages needs a GitHub token with `read:packages`, even for a public package. A workflow of another repository reads it with its `GITHUB_TOKEN` (`packages: read`) once the package's settings ("Manage Actions access") give that repository Read.
 
 ## Configuration
 
@@ -50,7 +50,7 @@ ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 | --- | --- | --- |
 | `REDMINE_ROLE` | Turns on the features for Lambda ([README.md](README.md#features)) | Required on Lambda. Per function: `web`, `worker` or `task`. Without it, the features stay off |
 
-- **Settings from SSM:** To read settings and secrets from SSM Parameter Store at start-up, use [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/). With it installed, "Status and connections" shows the names of the parameters read.
+To read settings and secrets from SSM Parameter Store at start-up, use [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/). With it installed, "Status and connections" shows the names of the parameters read.
 
 ## AWS resources
 
