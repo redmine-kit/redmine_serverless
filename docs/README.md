@@ -51,3 +51,7 @@ On Lambda (when `REDMINE_ROLE` is set), the plugin adapts Redmine as follows. [S
 | Fixed settings | The readers return the fixed values on Lambda, saving does not change them, Redmine's standard behavior without the role; the settings page shows the inputs disabled |
 | The replaced code | The SHA-256 of `Setting.define_setting` in Redmine is compared, so that an upgrade of Redmine that changes it is noticed |
 | Administration pages | Only administrators; no secrets on the page; the database check and its failure; one menu item |
+
+## Sponsors
+
+<Sponsors><a href="https://localstack.cloud">LocalStack</a></Sponsors>
