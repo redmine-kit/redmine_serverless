@@ -29,8 +29,8 @@ class RedmineServerlessScreenshotsTest < ScreenshotCase
       visit '/admin/serverless/status'
       shoot 'admin-menu', language, selector: '#sidebar ul'
 
-      click_button I18n.t(:button_serverless_check, locale: language)
-      assert_selector 'table.serverless-checks'
+      click_link I18n.t(:button_serverless_check, locale: language)
+      assert_selector 'table.list.checks'
       shoot 'status', language
 
       visit '/settings?tab=repositories'

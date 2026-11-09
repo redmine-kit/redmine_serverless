@@ -1,62 +1,69 @@
 <%= render partial: 'serverless_admin/tabs', locals: { selected: 'status' } %>
 
 <h3><%= l(:label_serverless_function) %></h3>
-<table class="list">
-  <tbody>
+<div class="box tabular settings">
   <% @status.function.each do |name, value| %>
-    <tr><th><%= l(:"field_serverless_function_#{name}") %></th><td><%= value || '-' %></td></tr>
+  <p><label><%= l(:"field_serverless_function_#{name}") %></label><%= value || '-' %></p>
   <% end %>
-  </tbody>
-</table>
+</div>
 
 <h3><%= l(:label_serverless_versions) %></h3>
-<table class="list">
-  <tbody>
+<div class="box tabular settings">
   <% @status.versions.each do |name, version| %>
-    <tr><th><%= name %></th><td><%= version %></td></tr>
+  <p><label><%= name %></label><%= version %></p>
   <% end %>
-  </tbody>
-</table>
+</div>
 
 <% loaded = @status.loaded_settings %>
 <% unless loaded.nil? %>
 <h3><%= l(:label_serverless_loaded_settings) %></h3>
-<% if loaded.empty? %>
-  <p class="nodata"><%= l(:label_no_data) %></p>
-<% else %>
+<% if loaded.any? %>
+<div class="box">
   <p><%= safe_join(loaded.map { |name| content_tag(:code, name) }, ', ') %></p>
+</div>
+<% else %>
+<p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
 <% end %>
 
 <h3><%= l(:label_serverless_fixed_settings) %></h3>
 <% if RedmineServerless.lambda? %>
-<table class="list">
-  <tbody>
+<div class="box tabular settings">
   <% @status.fixed_settings.each do |name, value| %>
-    <tr><th><%= l(:"setting_#{name}") %> (<code><%= name %></code>)</th><td><%= Array(value).join(', ').presence || '-' %></td></tr>
+  <p><label><%= l(:"setting_#{name}") %></label><%= Array(value).join(', ').presence || '-' %> <em class="info"><%= name %></em></p>
   <% end %>
-  </tbody>
-</table>
+</div>
 <% else %>
-  <p><%= l(:text_serverless_not_on_lambda) %></p>
+<p class="nodata"><%= l(:text_serverless_not_on_lambda) %></p>
 <% end %>
 
 <h3><%= l(:label_serverless_connection_check) %></h3>
-<%= form_tag({ controller: 'serverless_status', action: 'check' }, method: :post) do %>
-  <p><%= submit_tag l(:button_serverless_check) %></p>
-<% end %>
+
+<p><%= link_to sprite_icon('checked', l(:button_serverless_check)), serverless_status_check_path, method: :post, class: 'icon icon-checked' %></p>
+
 <% if @results %>
-<table class="list serverless-checks">
-  <thead><tr><th><%= l(:field_name) %></th><th><%= l(:field_status) %></th><th><%= l(:label_serverless_detail) %></th><th>ms</th></tr></thead>
-  <tbody>
-  <% @results.each do |result| %>
-    <tr class="<%= result.ok ? 'ok' : 'failed' %>">
-      <td><%= l(result.label) %></td>
-      <td><%= result.ok ? l(:label_serverless_ok) : l(:label_serverless_failed) %></td>
-      <td><%= result.detail %></td>
-      <td><%= result.milliseconds %></td>
-    </tr>
-  <% end %>
-  </tbody>
+<div class="autoscroll">
+<table class="list checks"><thead>
+<tr>
+    <th><%= l(:field_name) %></th>
+    <th><%= l(:field_status) %></th>
+    <th><%= l(:label_serverless_detail) %></th>
+    <th>ms</th>
+</tr></thead>
+<tbody>
+<% @results.each do |result| %>
+<tr class="<%= result.ok ? 'ok' : 'failed' %>">
+    <td class="name"><%= l(result.label) %></td>
+    <td class="tick">
+      <span class="icon-only icon-<%= result.ok ? 'ok' : 'error' %>">
+        <%= result.ok ? sprite_icon('checked', l(:label_serverless_ok)) : sprite_icon('warning', l(:label_serverless_failed)) %>
+      </span>
+    </td>
+    <td class="description"><%= result.detail %></td>
+    <td><%= result.milliseconds %></td>
+</tr>
+<% end %>
+</tbody>
 </table>
+</div>
 <% end %>

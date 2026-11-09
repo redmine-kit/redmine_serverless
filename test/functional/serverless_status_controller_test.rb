@@ -17,9 +17,11 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'h2', text: 'Serverless'
     assert_select 'div.tabs a#tab-status.selected'
-    assert_select 'td', text: 'web'
-    assert_select 'th', text: /Redmine Serverless/
-    assert_select 'code', text: 'enabled_scm'
+    assert_select 'div.box.tabular p', text: /REDMINE_ROLE\)\s*web/
+    assert_select 'div.box.tabular p label', text: /Redmine Serverless/
+    assert_select 'div.box.tabular p em.info', text: 'enabled_scm'
+    assert_select 'table.list', 0, 'name/value data is laid out as .box.tabular rows, not tables'
+    assert_select 'p a.icon.icon-checked[data-method=post]'
   end
 
   def test_index_without_the_role
@@ -35,8 +37,9 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
     post :check
 
     assert_response :success
-    assert_select 'table.serverless-checks tr.ok td', text: 'Database'
-    assert_select 'table.serverless-checks tr.ok td', text: /\Auser /
+    assert_select 'table.list.checks tr.ok td.name', text: 'Database'
+    assert_select 'table.list.checks tr.ok td.description', text: /\Auser /
+    assert_select 'table.list.checks tr.ok td.tick span.icon-ok'
   end
 
   def test_a_failing_check_is_shown_and_the_page_still_opens
@@ -44,7 +47,8 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
     post :check
 
     assert_response :success
-    assert_select 'table.serverless-checks tr.failed td', text: 'IOError: unreachable'
+    assert_select 'table.list.checks tr.failed td.description', text: 'IOError: unreachable'
+    assert_select 'table.list.checks tr.failed td.tick span.icon-error'
   ensure
     RedmineServerlessAdmin.instance_variable_get(:@checks).delete('broken')
   end
