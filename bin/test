@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# The plugin's tests in Redmine 7.0.3 on PostgreSQL 16, in Docker.
+#   bin/test                 # the plugin's tests, then the Redmine tests around the replaced code
+#   bin/test --redmine       # also every Redmine test, with the plugin installed
+#   bin/test <files>         # some files of the plugin's tests
+# Commands that run inside the container are in single quotes on purpose.
+# shellcheck disable=SC2016
+set -euo pipefail
+cd "$(dirname "$0")/.."
+image=redmine-serverless-test
+bin/services >/dev/null
+docker buildx build --load -q -t "$image" -f test/Dockerfile . >/dev/null
+run() {
+  docker run --rm --network redmine-serverless-test_default -e PARALLEL_WORKERS="${PARALLEL_WORKERS:-4}" "$image" \
+    sh -c 'bin/rails db:drop db:create db:migrate db:schema:dump >/dev/null && "$@"' test "$@"
+}
+redmine_tests=(test/unit/setting_test.rb test/functional/settings_controller_test.rb
+  test/functional/repositories_controller_test.rb test/functional/sys_controller_test.rb
+  test/functional/mail_handler_controller_test.rb test/functional/admin_controller_test.rb)
+if [[ "${1:-}" == "--redmine" ]]; then
+  run bin/rails test plugins/redmine_serverless/test
+  run bin/rails test
+elif (($#)); then
+  run bin/rails test "${@/#/plugins/redmine_serverless/}"
+else
+  run bin/rails test plugins/redmine_serverless/test
+  run bin/rails test "${redmine_tests[@]}"
+fi
