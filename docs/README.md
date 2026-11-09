@@ -55,3 +55,7 @@ On Lambda (when `REDMINE_ROLE` is set), the plugin adapts Redmine as follows. [S
 ## Sponsors
 
 <Sponsors><a href="https://localstack.cloud">LocalStack</a></Sponsors>
+
+## License
+
+Redmine Serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](../LICENSE). Not affiliated with the Redmine project.

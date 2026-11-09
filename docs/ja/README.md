@@ -58,6 +58,14 @@ Lambda の上(`REDMINE_ROLE` があるとき)では、プラグインが Redmine
 | 差し替えたコード | Redmine の `Setting.define_setting` の SHA-256 を比べ、Redmine のバージョンアップで変わったら気づけるようにする |
 | 管理画面 | 管理者だけ。秘密を画面に出さない。データベースの確認と、その失敗。メニューの項目は 1 つ |
 
+<a id="sponsors"></a>
+
 ## スポンサー
 
 <Sponsors><a href="https://localstack.cloud">LocalStack</a></Sponsors>
+
+<a id="license"></a>
+
+## ライセンス
+
+Redmine Serverless は、GNU General Public License バージョン 2 またはそれ以降のバージョンで公開しています。[LICENSE](../../LICENSE) を参照してください。Redmine projectとは関係ありません。

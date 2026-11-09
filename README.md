@@ -15,6 +15,15 @@ A Redmine plugin for running Redmine on AWS Lambda: the Lambda Web Adapter `/eve
 - Website: https://redmine-kit.github.io/redmine_serverless/ (日本語: https://redmine-kit.github.io/redmine_serverless/ja/)
 - Markdown: [docs/README.md](docs/README.md) (日本語: [docs/ja/README.md](docs/ja/README.md)), with [setup](docs/setup.md), [IAM permissions](docs/iam.md) and the [administration pages](docs/admin.md)
 
+## Sponsors
+
+<a href="https://localstack.cloud">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/localstack-logo-dark.svg">
+    <img alt="LocalStack" src=".github/assets/localstack-logo.svg" width="120" height="28">
+  </picture>
+</a>
+
 ## License
 
 Redmine Serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](LICENSE). Not affiliated with the Redmine project.
