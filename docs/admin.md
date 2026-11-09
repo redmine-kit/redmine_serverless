@@ -25,6 +25,8 @@ The specifications in this page were checked against official information and th
 
 All the Redmine Serverless plugins put their administration pages under one item, "Serverless", in Redmine's administration menu, whichever of them are installed. The pages are tabs of one page.
 
+<img src="./images/admin-menu.png" alt="Redmine's administration menu with the Serverless item" width="240">
+
 - **One item:** The first plugin that loads adds the "Serverless" item and the shared page; the others only add their tabs. A plugin adds the item only if Redmine's administration menu does not have it yet (`Redmine::MenuManager.items(:admin_menu)`). Every plugin carries the same three files: the registry `RedmineServerlessAdmin` (`lib/redmine_serverless_admin.rb`), the controller `ServerlessAdminController` and the view `serverless_admin/_tabs`. Redmine's code loader and view paths use the first copy and ignore the others, so the copies are kept the same (`SHARED_VERSION`). Each plugin registers its tab and its connection check there in `init.rb` (`register_tab`, `register_check`); the first registration adds the menu item. The item opens `/admin/serverless`, which goes to the first tab.
 - **Order of the tabs:** Status and connections, Jobs, Sending email, Receiving email, Attachments in S3. A tab appears only when its plugin is installed.
 - **Without this plugin:** The "Status and connections" tab is not shown, and the other plugins' tabs still appear under "Serverless". For example, a Redmine with only Redmine Serverless S3 has a "Serverless" item with one tab, "Attachments in S3".
@@ -32,6 +34,8 @@ All the Redmine Serverless plugins put their administration pages under one item
 - **Project settings:** The "Mail" tab in project settings that Redmine Serverless SES adds is not part of this menu.
 
 ## Status and connections
+
+![The Status and connections tab after Check the connections: the function, the versions, the fixed settings and the results of the checks](./images/status.png)
 
 | Item | Contents | Source |
 | --- | --- | --- |
@@ -57,6 +61,8 @@ All the Redmine Serverless plugins put their administration pages under one item
 
 Standard Redmine settings that do not work on Lambda, or that this design does not leave open, are fixed to disabled by the plugin, and Redmine's settings page shows this.
 
+![Administration › Settings › Repositories on Lambda: no SCM can be enabled, and the fixed settings are disabled with a note](./images/fixed-settings.png)
+
 | Setting (name in the Redmine UI) | Page | How the plugin handles it | Reason |
 | --- | --- | --- | --- |
 | Enabled SCM (`enabled_scm`) | Administration › Settings › Repositories | Fixed to empty. Projects can no longer have repositories | There is nowhere to keep repositories (`/tmp` is per execution environment and disappears). Commands such as Git are not in the image either |
@@ -77,3 +83,5 @@ The pages call no AWS API of this plugin's own; see [iam.md](iam.md).
 ## Tests
 
 Each page has Redmine functional tests ([testing.md](https://redmine-kit.github.io/serverless/testing.html#administration-pages)).
+
+The screenshots on this page are taken with `bin/screenshots` (headless Chromium in Docker, with Redmine's test data). Run it after changing a screen.

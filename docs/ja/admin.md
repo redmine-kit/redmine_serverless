@@ -31,6 +31,8 @@
 
 Redmine Serverless のプラグインは、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に置きます。画面は、1 つのページのタブになります。
 
+<img src="./images/admin-menu.png" alt="Redmine の管理のメニューの「Serverless」の項目" width="240">
+
 - **項目は 1 つ:** 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを足し、ほかのプラグインはタブだけを足します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ足します(`Redmine::MenuManager.items(:admin_menu)`)。どのプラグインも、同じ 3 つのファイルを持ちます。登録先の `RedmineServerlessAdmin`(`lib/redmine_serverless_admin.rb`)、コントローラーの `ServerlessAdminController`、ビューの `serverless_admin/_tabs` です。Redmine のコードの読み込みとビューのパスは、最初に見つけたものを使い、ほかは使わないので、どのコピーも同じにしておきます(`SHARED_VERSION`)。各プラグインは、`init.rb` で、そこに自分のタブと接続の確認を登録します(`register_tab`、`register_check`)。最初の登録が、メニューの項目を足します。項目は `/admin/serverless` を開き、そこから最初のタブに移ります。
 - **タブの並び:** 状態と接続、ジョブ、メールの送信、メールの受信、添付ファイルの S3。タブは、そのプラグインをインストールしているときだけ出ます。
 - **このプラグインがないとき:** 「状態と接続」のタブは出ず、ほかのプラグインのタブは「Serverless」の下に出ます。たとえば、Redmine Serverless S3 だけをインストールした Redmine では、「Serverless」の項目に「添付ファイルの S3」のタブが 1 つだけ出ます。
@@ -40,6 +42,8 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 <a id="status-and-connections"></a>
 
 ## 状態と接続
+
+![「接続の確認」を押したあとの「状態と接続」のタブ。関数、バージョン、固定している設定、確認の結果](./images/status.png)
 
 | 項目 | 中身 | 取り方 |
 | --- | --- | --- |
@@ -67,6 +71,8 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 
 Redmine の標準の設定のうち、Lambda の上では動かないものや、この設計では開けておかないものは、プラグインが無効に固定し、Redmine の設定の画面にもそう表示します。
 
+![Lambda の上の「管理 › 設定 › リポジトリ」。バージョン管理システムを選べず、固定している設定は入力できない状態で注記が付く](./images/fixed-settings.png)
+
 | 設定(Redmine の画面の名前) | 画面 | プラグインの扱い | 理由 |
 | --- | --- | --- | --- |
 | 使用するバージョン管理システム(`enabled_scm`) | 管理 › 設定 › リポジトリ | 空に固定する。プロジェクトにリポジトリを作れなくなる | リポジトリを置く場所がない(`/tmp` は環境ごとで、消える)。Git などのコマンドもイメージに入れない |
@@ -91,3 +97,5 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 ## テスト
 
 画面ごとに、Redmine の機能のテストがあります([testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#administration-pages))。
+
+このページの画面のスクリーンショットは、`bin/screenshots` で撮ります(Docker の中のヘッドレスの Chromium と、Redmine のテストのデータ)。画面を変えたら実行します。
