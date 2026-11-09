@@ -82,6 +82,8 @@ ln -s "$(bundle info --path redmine_serverless)" plugins/redmine_serverless
 
 テストは `test/` にあり、Redmine の標準のしくみで、Docker の中の Redmine 7.0.3 と PostgreSQL 16 で動かします。`bin/test` は、プラグインのテストのあと、差し替えたコードのまわりの Redmine 本体のテスト(設定、リポジトリ、`sys`、メールの受信、管理)を動かします。`bin/test --redmine` は、プラグインを入れた状態で Redmine 本体のすべてのテストを動かします。CI はこちらです。Serverless も、自分のイメージでプラグインのテストを動かします([Serverless の testing.md](https://redmine-kit.github.io/serverless/ja/testing.html#running-on-lambda-redmine_serverless))。
 
+プラグインのテストは、プラグイン自身のファイルのカバレッジ(SimpleCov。Cobertura の XML の `coverage/coverage.xml`)も書きます。CI は、それを [Codecov](https://codecov.io/gh/redmine-kit/redmine_serverless) に送ります。
+
 ```sh
 bin/test            # プラグインのテストと、そのまわりの Redmine のテスト
 bin/test --redmine  # Redmine のすべてのテストも

@@ -1,5 +1,7 @@
 # Redmine Serverless
 
+[![codecov](https://codecov.io/gh/redmine-kit/redmine_serverless/graph/badge.svg)](https://codecov.io/gh/redmine-kit/redmine_serverless)
+
 Redmine を AWS Lambda で動かすための Redmine のプラグインです。Lambda Web Adapter の `/events`、Lambda で使えない Redmine の設定の固定と画面での表示、AWS の側の状態と接続を見る「Serverless」の管理画面を持ちます。[Serverless](https://github.com/redmine-kit/serverless) のプラグインです。添付ファイル、メール、ジョブ、Parameter Store の設定は、別のプラグインの [Redmine Serverless S3](https://github.com/redmine-kit/redmine_serverless_s3)、[Redmine Serverless SES](https://github.com/redmine-kit/redmine_serverless_ses)、[Redmine Serverless SQS](https://github.com/redmine-kit/redmine_serverless_sqs)、[Redmine Serverless SSM](https://github.com/redmine-kit/redmine_serverless_ssm) です。
 
 [English](README.md)

@@ -66,6 +66,8 @@ The permissions the plugin needs, with an example policy, are in [iam.md](iam.md
 
 The tests are in `test/` and run with Redmine's standard mechanism, in Redmine 7.0.3 on PostgreSQL 16 in Docker. `bin/test` runs the plugin's tests, then Redmine's own tests around the replaced code (settings, repositories, `sys`, incoming email, administration); `bin/test --redmine` runs every Redmine test with the plugin installed, as the CI does. Serverless also runs the plugin's tests in its image ([Serverless testing.md](https://redmine-kit.github.io/serverless/testing.html#running-on-lambda-redmine_serverless)).
 
+The plugin's tests also write the coverage of the plugin's own files (SimpleCov, Cobertura XML in `coverage/coverage.xml`), which CI uploads to [Codecov](https://codecov.io/gh/redmine-kit/redmine_serverless).
+
 ```sh
 bin/test            # the plugin's tests and Redmine's tests around them
 bin/test --redmine  # with every Redmine test
