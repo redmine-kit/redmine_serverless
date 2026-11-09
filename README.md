@@ -9,7 +9,7 @@ A Redmine plugin for running Redmine on AWS Lambda: the Lambda Web Adapter `/eve
 ## Documentation
 
 - Website: https://redmine-kit.github.io/redmine_serverless/ (日本語: https://redmine-kit.github.io/redmine_serverless/ja/)
-- Markdown: [docs/README.md](docs/README.md) (日本語: [docs/ja/README.md](docs/ja/README.md)), with [setup](docs/setup.md) and the [administration pages](docs/admin.md)
+- Markdown: [docs/README.md](docs/README.md) (日本語: [docs/ja/README.md](docs/ja/README.md)), with [setup](docs/setup.md), [IAM permissions](docs/iam.md) and the [administration pages](docs/admin.md)
 
 ## License
 

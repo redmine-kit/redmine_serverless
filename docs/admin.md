@@ -41,7 +41,7 @@ A "Serverless" item is added to Redmine's administration menu, with the pages as
 | SQS | `GetQueueAttributes`, added by Redmine Serverless SQS |
 | SSM | `GetParametersByPath` (1 item only), added by Redmine Serverless SSM |
 
-- **Permissions of the checks:** Each check uses the permission that its plugin lists in its setup page; this plugin needs none of its own.
+- **Permissions of the checks:** Each check uses the permission that its plugin lists on its IAM page; this plugin needs none of its own.
 
 - **Use:** After changing IAM permissions, network settings or SSM settings, you can check on the page how far requests reach. With Lambda inside a VPC, it also helps check VPC endpoint and security group settings.
 
@@ -64,7 +64,7 @@ Standard Redmine settings that do not work on Lambda, or that this design does n
 
 ## Permissions
 
-The pages call no AWS API of this plugin's own; see [setup.md](setup.md#iam-permissions).
+The pages call no AWS API of this plugin's own; see [iam.md](iam.md).
 
 ## Tests
 

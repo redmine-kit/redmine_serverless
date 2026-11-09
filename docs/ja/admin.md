@@ -47,7 +47,7 @@ Redmine の管理のメニューに「Serverless」を足し、画面をタブ�
 | SQS | `GetQueueAttributes`。Redmine Serverless SQS が足す |
 | SSM | `GetParametersByPath`(1 件だけ)。Redmine Serverless SSM が足す |
 
-- **確認の権限:** それぞれの確認は、そのプラグインが準備のページに書いた権限を使います。このプラグイン自身の権限は要りません。
+- **確認の権限:** それぞれの確認は、そのプラグインが IAM の権限のページに書いた権限を使います。このプラグイン自身の権限は要りません。
 
 - **使い道:** IAM の権限、ネットワークの設定、SSM の設定を変えたあとに、どこまで届くかを画面で確認できます。Lambda を VPC に入れたときは、VPC エンドポイントやセキュリティグループの設定の確認にも使えます。
 
@@ -74,7 +74,7 @@ Redmine の標準の設定のうち、Lambda の上では動かないものや�
 
 ## 権限
 
-画面は、このプラグイン自身の AWS の API を呼びません。[setup.md](setup.md#iam-permissions) を見てください。
+画面は、このプラグイン自身の AWS の API を呼びません。[iam.md](iam.md) を見てください。
 
 <a id="tests"></a>
 

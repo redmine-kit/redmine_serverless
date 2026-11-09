@@ -38,29 +38,7 @@ Redmine Serverless を使う Redmine に要るもの(インストール、設定
 
 ## IAM の権限
 
-プラグインは自分では AWS の API を呼ばないので、自分の権限は要りません。Lambda そのものの権限(ログ、VPC の中での実行)は、[Serverless の iam.md](https://redmine-kit.github.io/serverless/ja/iam.html) にあります。
-
-| 操作 | 対象 | 理由 |
-| --- | --- | --- |
-| なし | — | 「状態と接続」の S3、SES、SQS、SSM の確認は、それぞれのプラグインが足し、その準備のページにある権限を使う |
-
-<a id="example-policy"></a>
-
-### 例のポリシー
-
-ありません。
-
-<a id="resource-based-policies"></a>
-
-### リソースベースのポリシー
-
-ありません。
-
-<a id="not-checked-yet"></a>
-
-### 未確認のこと
-
-ありません。
+プラグインに要る権限と例のポリシーは、[iam.md](iam.md) にあります。
 
 <a id="network"></a>
 
