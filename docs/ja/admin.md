@@ -1,6 +1,6 @@
 # 管理画面
 
-Redmine Serverless が Redmine の管理のメニューに足す「Serverless」の画面の設計です。使っていない機能の画面は出しません。AWS への接続の状態を、Redmine の画面で確認できるようにします。[Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/admin.html)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/admin.html)、[Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/admin.html) を入れると、それぞれの画面がここのタブに加わります。
+すべての Redmine Serverless のプラグインが共有する、Redmine の管理のメニューの「Serverless」の項目と、そこに Redmine Serverless が置く画面の設計です。使っていない機能の画面は出しません。AWS への接続の状態を、Redmine の画面で確認できるようにします。[Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/admin.html)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/admin.html)、[Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/admin.html) を入れると、それぞれの画面がここのタブに加わります。
 
 この資料の仕様は、2026-11-08 時点の公式の情報と、Redmine 7.0.3 のソースで確認したものです。出典は [sources.md](https://redmine-kit.github.io/serverless/ja/sources.html) にあります。
 
@@ -25,7 +25,17 @@ Redmine Serverless が Redmine の管理のメニューに足す「Serverless」
 | メールの送信、メールの受信 | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/admin.html) | そのプラグインを入れたときに加わる |
 | 添付ファイルの S3 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/admin.html) | そのプラグインを入れたときに加わる |
 
-Redmine の管理のメニューに「Serverless」を足し、画面をタブで並べます。プラグインの一覧の「設定」からも開けます。
+<a id="the-serverless-menu"></a>
+
+## Serverless のメニュー
+
+Redmine Serverless のプラグインは、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に置きます。画面は、1 つのページのタブになります。
+
+- **項目は 1 つ:** 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを足し、ほかのプラグインはタブだけを足します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ足します(`Redmine::MenuManager.items(:admin_menu)`)。具体的なしくみ(たとえば、どのプラグインにも同じ小さな共有の部品を持たせ、まだ定義されていないときだけ定義する)は、コードを書くときに決めます。
+- **タブの並び:** 状態と接続、ジョブ、メールの送信、メールの受信、添付ファイルの S3。タブは、そのプラグインをインストールしているときだけ出ます。
+- **このプラグインがないとき:** 「状態と接続」のタブは出ず、ほかのプラグインのタブは「Serverless」の下に出ます。たとえば、Redmine Serverless S3 だけをインストールした Redmine では、「Serverless」の項目に「添付ファイルの S3」のタブが 1 つだけ出ます。
+- **プラグインの一覧から:** プラグインの一覧で各プラグインの「設定」を開くと、そのプラグインのタブが開きます。
+- **プロジェクトの設定:** Redmine Serverless SES がプロジェクトの設定に足す「メール」のタブは、このメニューには含めません。
 
 <a id="status-and-connections"></a>
 

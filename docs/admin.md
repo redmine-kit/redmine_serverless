@@ -1,6 +1,6 @@
 # Administration pages
 
-This is the design of the "Serverless" page that Redmine Serverless adds to Redmine's administration menu. Pages for features that are not in use are not shown. The page lets you check the state of connections to AWS from within Redmine. [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html), [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) and [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/admin.html) add their pages as tabs here when they are installed.
+This is the design of the "Serverless" item of Redmine's administration menu, which every Redmine Serverless plugin shares, and of the page that Redmine Serverless puts there. Pages for features that are not in use are not shown. The page lets you check the state of connections to AWS from within Redmine. [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html), [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) and [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/admin.html) add their pages as tabs here when they are installed.
 
 The specifications in this page were checked against official information and the Redmine 7.0.3 source as of 2026-11-08. Sources are in [sources.md](https://redmine-kit.github.io/serverless/sources.html).
 
@@ -21,7 +21,15 @@ The specifications in this page were checked against official information and th
 | Sending email, Receiving email | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) | Added by that plugin when it is installed |
 | Attachments in S3 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html) | Added by that plugin when it is installed |
 
-A "Serverless" item is added to Redmine's administration menu, with the pages as tabs. They can also be opened from "Configure" in the plugin list.
+## The Serverless menu
+
+All the Redmine Serverless plugins put their administration pages under one item, "Serverless", in Redmine's administration menu, whichever of them are installed. The pages are tabs of one page.
+
+- **One item:** The first plugin that loads adds the "Serverless" item and the shared page; the others only add their tabs. A plugin adds the item only if Redmine's administration menu does not have it yet (`Redmine::MenuManager.items(:admin_menu)`). The exact mechanism (for example, the same small shared part in every plugin, defined only if it is not defined yet) is decided when the code is written.
+- **Order of the tabs:** Status and connections, Jobs, Sending email, Receiving email, Attachments in S3. A tab appears only when its plugin is installed.
+- **Without this plugin:** The "Status and connections" tab is not shown, and the other plugins' tabs still appear under "Serverless". For example, a Redmine with only Redmine Serverless S3 has a "Serverless" item with one tab, "Attachments in S3".
+- **From the plugin list:** "Configure" of each plugin in the plugin list opens that plugin's tab.
+- **Project settings:** The "Mail" tab in project settings that Redmine Serverless SES adds is not part of this menu.
 
 ## Status and connections
 
