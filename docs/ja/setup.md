@@ -1,6 +1,6 @@
 # 準備
 
-Redmine Serverless を使う Redmine に要るもの(入れ方、設定、前提にする AWS のリソース、IAM の権限、ネットワーク)です。[Serverless](https://redmine-kit.github.io/serverless/ja/) は、これを CloudFormation でまとめて作ります。このページは、手で用意するときや、Serverless が作るものを確認するときのためのものです。プラグインは設計段階なので、下の内容は設計で、コードを書くときに確認します。
+Redmine Serverless を使う Redmine に要るもの(インストール、設定、前提にする AWS のリソース、IAM の権限、ネットワーク)です。[Serverless](https://redmine-kit.github.io/serverless/ja/) は、これを CloudFormation でまとめて作ります。このページは、手で用意するときや、Serverless が作るものを確認するときのためのものです。プラグインは設計段階なので、下の内容は設計で、コードを書くときに確認します。
 
 <a id="requirements"></a>
 
@@ -12,7 +12,7 @@ Redmine Serverless を使う Redmine に要るもの(入れ方、設定、前提
 
 <a id="installation"></a>
 
-## 入れ方
+## インストール
 
 1. プラグインを `plugins/redmine_serverless` に置き、`bundle install` を実行します(プラグインの `Gemfile` は Redmine の `Gemfile` が読み込みます)。
 2. `bin/rake redmine:plugins:migrate` を実行します。失敗したジョブの記録の表(`serverless_job_failures`)ができます。
