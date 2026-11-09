@@ -2,8 +2,8 @@
 
 Redmine Serverless(`redmine_serverless`)は、Redmine を AWS Lambda で動かすための Redmine のプラグインです。[Serverless](https://redmine-kit.github.io/serverless/ja/architecture.html) が、Lambda 用のイメージに入れて使います。Redmine 本体のファイルは書き換えず、Redmine の標準の拡張の仕組みだけで作ります。今は開発の初期です(バージョン 0.1.0)。
 
-- [準備](setup.md): 前提、インストール、設定、AWS のリソース、ネットワーク、テスト
-- [IAM の権限](iam.md): 権限、例のポリシー、リソースベースのポリシー
+- [導入](setup.md): 動作環境、インストール、設定、AWS のリソース、ネットワーク、テスト
+- [IAM の権限](iam.md): 権限、ポリシーの例、リソースベースのポリシー
 - [管理画面](admin.md): 状態と接続、Lambda で使えない Redmine の設定
 - [Lambda で動かすとき](#running-on-lambda): `/events`、アセットの確認、テスト
 

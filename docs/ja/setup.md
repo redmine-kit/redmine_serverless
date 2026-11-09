@@ -1,10 +1,10 @@
-# 準備
+# 導入
 
 Redmine Serverless を使う Redmine に要るもの(インストール、設定、前提にする AWS のリソース、IAM の権限、ネットワーク)です。[Serverless](https://redmine-kit.github.io/serverless/ja/) は、これらをすべて CloudFormation で作ります。このページは、手で用意するときや、Serverless が作るものを確認するときのためのものです。
 
 <a id="requirements"></a>
 
-## 前提
+## 動作環境
 
 - PostgreSQL の上の Redmine 7.0 以降。
 - AWS Lambda では、[Serverless](https://redmine-kit.github.io/serverless/ja/lambda.html#image) と同じく、Lambda Web Adapter を入れたコンテナイメージ。Lambda 以外(`REDMINE_ROLE` がないとき)では、プラグインの機能は動かず、Redmine は標準のままに動きます。
@@ -99,6 +99,6 @@ bin/services --down # PostgreSQL を止める
 
 <a id="to-verify"></a>
 
-## 確認すること
+## 未確認の事項
 
 - 今はありません。2026-11-09 に Redmine 7.0.3 で確認しました。テンプレートを差し替えずに、フック `view_layouts_base_html_head` だけで、設定の画面の入力を無効にできます([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))。
