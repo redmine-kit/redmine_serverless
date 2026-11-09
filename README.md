@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-A Redmine plugin for running Redmine on AWS serverless services: attachments in S3, Redmine on Lambda, retries and import of mail through SES, email addresses per project, and administration pages for the AWS side. It is the plugin of [Serverless](https://github.com/redmine-kit/serverless), and S3 attachments can also be used outside Lambda.
+A Redmine plugin for running Redmine on AWS Lambda: the Lambda Web Adapter `/events` endpoint, Redmine settings that cannot work on Lambda fixed and shown on screen, records of failed jobs with resending, and administration pages for the AWS side. It is the plugin of [Serverless](https://github.com/redmine-kit/serverless). Attachments in S3 and email through SES are the separate plugins [Redmine Serverless S3](https://github.com/redmine-kit/redmine_serverless_s3) and [Redmine Serverless SES](https://github.com/redmine-kit/redmine_serverless_ses).
 
 [日本語](README.ja.md)
 
@@ -9,7 +9,7 @@ A Redmine plugin for running Redmine on AWS serverless services: attachments in 
 ## Documentation
 
 - Website: https://redmine-kit.github.io/redmine_serverless/ (日本語: https://redmine-kit.github.io/redmine_serverless/ja/)
-- Markdown: [docs/README.md](docs/README.md) (日本語: [docs/ja/README.md](docs/ja/README.md)), with [attachments in S3](docs/attachments.md) and [administration pages](docs/admin.md)
+- Markdown: [docs/README.md](docs/README.md) (日本語: [docs/ja/README.md](docs/ja/README.md)), with the [administration pages](docs/admin.md)
 
 ## License
 
