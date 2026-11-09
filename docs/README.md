@@ -58,4 +58,4 @@ On Lambda (when `REDMINE_ROLE` is set), the plugin adapts Redmine as follows. [S
 
 ## License
 
-Redmine Serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](../LICENSE). Not affiliated with the Redmine project.
+Redmine Serverless is released under the GNU General Public License, version 2 or (at your option) any later version. See [LICENSE](../LICENSE). An unofficial Redmine plugin.
