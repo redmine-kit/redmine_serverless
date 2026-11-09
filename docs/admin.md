@@ -1,6 +1,6 @@
 # Administration pages
 
-This is the design of the pages that Redmine Serverless adds to Redmine's administration menu. The "Feature used" column for each page refers to the features inside the plugin ([the plugin's features](README.md#features)). Pages for features that are not in use are not shown. The pages let you check the state of connections to AWS and operate jobs from within Redmine. [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html) and [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) add their pages as tabs here when they are installed.
+This is the design of the "Serverless" page that Redmine Serverless adds to Redmine's administration menu. Pages for features that are not in use are not shown. The page lets you check the state of connections to AWS from within Redmine. [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html), [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) and [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/admin.html) add their pages as tabs here when they are installed.
 
 The specifications in this page were checked against official information and the Redmine 7.0.3 source as of 2026-11-08. Sources are in [sources.md](https://redmine-kit.github.io/serverless/sources.html).
 
@@ -10,14 +10,14 @@ The specifications in this page were checked against official information and th
 - **No secrets shown:** Values in SSM Parameter Store, `SECRET_KEY_BASE` and the database password are not shown. Only parameter names and whether they could be read are shown.
 - **Call AWS APIs only when needed:** So that opening a page does not call many APIs, state is cached for 1 minute, and heavy checks run as jobs when a button is pressed.
 - **Non-secret settings are changed on the page:** Non-secret settings are plugin settings (Redmine's `Setting.plugin_*`, stored in the database) and can be changed on the page. Values set by the infrastructure, such as AWS resource names, stay as environment variables and are only displayed.
-- **Operations are logged:** Operations such as resending and deleting are written to Redmine's log with who did what and when.
+- **Operations are logged:** Operations on the pages are written to Redmine's log with who did what and when.
 
 ## List of pages
 
-| Page | Feature used | Contents |
+| Page | Added by | Contents |
 | --- | --- | --- |
-| Status and connections | Running on Lambda | The running function and its version, whether the database and each AWS service are reachable, names of loaded settings, disabled Redmine settings |
-| Jobs | Job failure records | Number of messages in the SQS queues, list of failed jobs, resend and delete |
+| Status and connections | This plugin | The running function and its version, whether the database and each AWS service are reachable, names of loaded settings, disabled Redmine settings |
+| Jobs | [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/admin.html) | Added by that plugin when it is installed |
 | Sending email, Receiving email | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) | Added by that plugin when it is installed |
 | Attachments in S3 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html) | Added by that plugin when it is installed |
 
@@ -29,16 +29,19 @@ A "Serverless" item is added to Redmine's administration menu, with the pages as
 | --- | --- | --- |
 | Function | Function name, role (`REDMINE_ROLE`), version, image tag | Lambda environment variables (`AWS_LAMBDA_FUNCTION_NAME`, etc.) and values put into the image at build time |
 | Versions | Redmine, Ruby, Rails, the installed Redmine Serverless plugins | The same as Redmine's information page |
-| Loaded settings | Names of parameters under `/<instance>/env/` and whether they could be read (values are not shown) | The result of reading them at start-up |
+| Loaded settings | Names of parameters under `/<instance>/env/` and whether they could be read (values are not shown). Shown when [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/) is installed | The result of reading them at start-up (`RedmineServerlessSsm.loaded`) |
 | Disabled Redmine settings | The list in "Redmine settings that cannot work on Lambda" below and their current values | Values set by the plugin |
-| Connection check | Whether the database, SQS and SSM are reachable, and how long it took | When the button is pressed, make one light call to each (table below) |
+| Connection check | Whether the database and the AWS services of the installed plugins are reachable, and how long it took | When the button is pressed, make one light call to each (table below) |
 
 | Target | API called |
 | --- | --- |
 | Database | Open a new connection to the configured PostgreSQL database (such as RDS for PostgreSQL) and run `SELECT 1`. Also show the database user connected as (`current_user`) |
-| SQS | `GetQueueAttributes` |
-| SSM | `GetParametersByPath` (1 item only) |
-| S3, SES | Added by Redmine Serverless S3 (`HeadBucket`) and Redmine Serverless SES (`GetAccount`) when they are installed |
+| S3 | `HeadBucket`, added by Redmine Serverless S3 |
+| SES | `GetAccount`, added by Redmine Serverless SES |
+| SQS | `GetQueueAttributes`, added by Redmine Serverless SQS |
+| SSM | `GetParametersByPath` (1 item only), added by Redmine Serverless SSM |
+
+- **Permissions of the checks:** Each check uses the permission that its plugin lists in its setup page; this plugin needs none of its own.
 
 - **Use:** After changing IAM permissions, network settings or SSM settings, you can check on the page how far requests reach. With Lambda inside a VPC, it also helps check VPC endpoint and security group settings.
 
@@ -59,28 +62,10 @@ Standard Redmine settings that do not work on Lambda, or that this design does n
 - **Condition:** The values are fixed only on Lambda (when `REDMINE_ROLE` is set). In local tests and environments other than Lambda, standard Redmine behavior applies.
 - **"Information" on the administration page:** Redmine's standard checks (whether the file storage directory is writable, whether the job queue was changed from the default, ImageMagick, Ghostscript, Pandoc, etc.) are expected to pass in Serverless (storage is `/tmp/redmine/files`, jobs use `:sqs`).
 
-## Jobs
-
-| Item | Contents | Source |
-| --- | --- | --- |
-| Queue counts | Jobs waiting, jobs running, jobs delayed | SQS `GetQueueAttributes` (`ApproximateNumberOfMessages`, etc.) |
-| Dead-letter queue count | Number of jobs that used up their retries | Same as above |
-| List of failed jobs | Job type (for email, the mail type and recipients; failed email can be listed on its own), error type and message, number of attempts, first and last time | The plugin's table (below) |
-| Resend | Put jobs back on SQS one at a time, or the selected ones together | Re-enqueue from the recorded job contents |
-| Delete | Remove failures that will not be resent from the list | — |
-| Redrive the dead-letter queue | Move jobs in the dead-letter queue back to the original queue | SQS `StartMessageMoveTask` |
-
-- **Recording failures:** When a job fails for the last time (when retries are used up, and on errors that are not retried), the plugin stores the job contents (`job.serialize`) and the error in its table (`serverless_job_failures`). The plugin's migration creates this table. The dead-letter queue is also kept in case writing to the database fails.
-- **Resend flow:** Fix the cause first (for example, resume SES sending, or remove an address from the suppression list), then press the resend button. Resending email is described in [mail.md](https://redmine-kit.github.io/serverless/mail.html#when-sending-fails); which SES errors are retried is decided by [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/).
-
 ## Permissions
 
-For these pages, the role of web requests gets permissions to read SQS queue counts, to resend jobs and to redrive the dead-letter queue. The list and an example policy are in [setup.md](setup.md#iam-permissions).
+The pages call no AWS API of this plugin's own; see [setup.md](setup.md#iam-permissions).
 
 ## Tests
 
 Each page has Redmine functional tests and system tests ([testing.md](https://redmine-kit.github.io/serverless/testing.html#administration-pages)).
-
-## To verify
-
-- Which mechanism in Rails ActiveJob can be used to record failures when retries are used up and on errors that are not retried (`after_discard`, etc.)
