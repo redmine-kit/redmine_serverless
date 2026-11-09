@@ -10,7 +10,13 @@ What a Redmine needs to use Redmine Serverless: installation, configuration, the
 ## Installation
 
 1. Get the plugin into `plugins/redmine_serverless` of Redmine 7.0: the gem below, or a checkout of this repository.
-2. Add the plugin to `Gemfile.local` as a gem, and run `bundle install`. Bundler then loads `boot/redmine_serverless.rb` before Rails initializes: the `/events` middleware and the asset setting must be in place by then, and Redmine's own loading of plugins (`init.rb`) comes too late for them. With a checkout, add it by path:
+2. Add the plugin to `Gemfile.local` as a gem, and install it:
+
+   ```sh
+   bundle install
+   ```
+
+   Bundler then loads `boot/redmine_serverless.rb` before Rails initializes: the `/events` middleware and the asset setting must be in place by then, and Redmine's own loading of plugins (`init.rb`) comes too late for them. With a checkout, add it by path:
 
    ```ruby
    # Redmine's Gemfile.local

@@ -45,7 +45,7 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 
 ![「接続の確認」を押したあとの「状態と接続」のタブ。関数、バージョン、固定している設定、確認の結果](./images/status.png)
 
-| 項目 | 中身 | 取り方 |
+| 項目 | 中身 | 取得元 |
 | --- | --- | --- |
 | 関数 | 関数の名前、役割(`REDMINE_ROLE`)、バージョン、イメージのタグ | Lambda の環境変数(`AWS_LAMBDA_FUNCTION_NAME` など)と、ビルドのときにイメージに入れた値 |
 | バージョン | Redmine、Ruby、Rails、入れている Redmine Serverless のプラグイン | Redmine の情報の画面と同じもの |

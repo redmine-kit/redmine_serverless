@@ -14,7 +14,13 @@ Redmine Serverless を使う Redmine に要るもの(インストール、設定
 ## インストール
 
 1. プラグインを、Redmine 7.0 の `plugins/redmine_serverless` に置きます。下の gem か、このリポジトリのチェックアウトです。
-2. プラグインを gem として `Gemfile.local` に足し、`bundle install` を実行します。こうすると、Bundler が、Rails の初期化より前に `boot/redmine_serverless.rb` を読み込みます。`/events` のミドルウェアとアセットの設定は、そのときまでに要り、Redmine がプラグインを読み込む(`init.rb`)のでは遅すぎるからです。チェックアウトなら、パスで足します。
+2. プラグインを gem として `Gemfile.local` に足し、インストールします。
+
+   ```sh
+   bundle install
+   ```
+
+   こうすると、Bundler が、Rails の初期化より前に `boot/redmine_serverless.rb` を読み込みます。`/events` のミドルウェアとアセットの設定は、そのときまでに要り、Redmine がプラグインを読み込む(`init.rb`)のでは遅すぎるからです。チェックアウトなら、パスで足します。
 
    ```ruby
    # Redmine の Gemfile.local
