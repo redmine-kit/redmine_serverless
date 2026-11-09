@@ -1,0 +1,6 @@
+# The sidebar section of this plugin's help, read by redmine_help
+# (https://github.com/redmine-kit/redmine_help, docs/extending.md).
+sections:
+  - id: serverless
+    title: Redmine Serverless
+    topics: [serverless/status]
