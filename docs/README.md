@@ -1,6 +1,6 @@
 # Redmine Serverless
 
-Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. [Serverless](https://redmine-kit.github.io/serverless/architecture.html) installs it in the Lambda image. It does not modify Redmine's own files and uses only Redmine's standard extension mechanisms. The plugin is in early development (version 0.1.0).
+Redmine Serverless (`redmine_serverless`) is a Redmine plugin for running Redmine on AWS Lambda. [Serverless](https://redmine-kit.github.io/serverless/architecture.html) installs it in the Lambda image. It does not modify Redmine's own files and uses only Redmine's standard extension mechanisms. The plugin is in early development.
 
 - [Setup](setup.md): requirements, installation, configuration, AWS resources, network, tests
 - [IAM permissions](iam.md): permissions, example policy, resource-based policies
