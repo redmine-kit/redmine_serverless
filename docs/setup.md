@@ -16,7 +16,7 @@ What a Redmine needs to use Redmine Serverless: installation, configuration, the
    bundle install
    ```
 
-   Bundler then loads `boot/redmine_serverless.rb` before Rails initializes: the `/events` middleware and the asset setting must be in place by then, and Redmine's own loading of plugins (`init.rb`) comes too late for them. With a checkout, add it by path:
+   Bundler then loads `boot/redmine_serverless.rb` before Rails initializes: the `/events` and forwarded host middlewares and the asset setting must be in place by then, and Redmine's own loading of plugins (`init.rb`) comes too late for them. With a checkout, add it by path:
 
    ```ruby
    # Redmine's Gemfile.local
@@ -83,4 +83,5 @@ bin/services --down # stops PostgreSQL
 
 ## To verify
 
-- Nothing for now. Checked on 2026-11-09 with Redmine 7.0.3: the hook `view_layouts_base_html_head` alone disables the inputs on the settings page, without replacing templates ([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)).
+- On AWS, whether the function URL passes CloudFront's `X-Forwarded-Host` to the function unchanged, so that the forwarded host middleware gets it. Lambda Web Adapter passes the request headers to Puma as they are (its 1.1.0 source, `src/lib.rs`; checked on 2026-11-10); the function URL's handling of the header is not in Lambda's documentation.
+- Checked on 2026-11-09 with Redmine 7.0.3: the hook `view_layouts_base_html_head` alone disables the inputs on the settings page, without replacing templates ([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda)).

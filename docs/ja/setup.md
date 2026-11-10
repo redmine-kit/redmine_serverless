@@ -20,7 +20,7 @@ Redmine Serverless を使う Redmine に要るもの(インストール、設定
    bundle install
    ```
 
-   こうすると、Bundler が、Rails の初期化より前に `boot/redmine_serverless.rb` を読み込みます。`/events` のミドルウェアとアセットの設定は、そのときまでに要り、Redmine がプラグインを読み込む(`init.rb`)のでは遅すぎるからです。チェックアウトなら、パスで追加します。
+   こうすると、Bundler が、Rails の初期化より前に `boot/redmine_serverless.rb` を読み込みます。`/events` と転送されたホストのミドルウェア、アセットの設定は、そのときまでに要り、Redmine がプラグインを読み込む(`init.rb`)のでは遅すぎるからです。チェックアウトなら、パスで追加します。
 
    ```ruby
    # Redmine の Gemfile.local
@@ -101,4 +101,5 @@ bin/services --down # PostgreSQL を止める
 
 ## 未確認の事項
 
-- 今はありません。2026-11-09 に Redmine 7.0.3 で確認しました。テンプレートを差し替えずに、フック `view_layouts_base_html_head` だけで、設定の画面の入力を無効にできます([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))。
+- AWS の上で、関数 URL が CloudFront の `X-Forwarded-Host` をそのまま関数に渡し、転送されたホストのミドルウェアに届くか。Lambda Web Adapter はリクエストヘッダーをそのまま Puma に渡します(1.1.0 のソースの `src/lib.rs`。2026-11-10 に確認)。関数 URL でのこのヘッダーの扱いは、Lambda のドキュメントにありません。
+- 2026-11-09 に Redmine 7.0.3 で確認しました。テンプレートを差し替えずに、フック `view_layouts_base_html_head` だけで、設定の画面の入力を無効にできます([admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda))。
