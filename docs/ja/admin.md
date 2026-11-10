@@ -18,9 +18,9 @@
 
 <a id="list-of-pages"></a>
 
-## 画面の一覧
+## 画面一覧
 
-| 画面 | 足すもの | 内容 |
+| 画面 | 追加するもの | 内容 |
 | --- | --- | --- |
 | ステータス | このプラグイン | 動いている関数とバージョン、データベースと AWS の各サービスに届くか、読み込んだ設定の名前、変更不可の Redmine の設定 |
 | ジョブ | [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/admin.html) | そのプラグインを入れたときに加わる |
@@ -37,11 +37,11 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 
 | 項目 | 内容 |
 | --- | --- |
-| 項目は 1 つ | 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを足し、ほかのプラグインはタブだけを足します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ足します(`Redmine::MenuManager.items(:admin_menu)`)。どのプラグインも、同じ 3 つのファイルを持ちます。登録先の `RedmineServerlessAdmin`(`lib/redmine_serverless_admin.rb`)、コントローラーの `ServerlessAdminController`、ビューの `serverless_admin/_tabs` です。Redmine のコードの読み込みとビューのパスは、最初に見つけたものを使い、ほかは使わないので、どのコピーも同じにしておきます(`SHARED_VERSION`)。各プラグインは、`init.rb` で、そこに自分のタブと接続テストを登録します(`register_tab`、`register_check`)。最初の登録が、メニューの項目を足します。項目は `/admin/serverless` を開き、そこから最初のタブに移ります |
+| 項目は 1 つ | 最初に読み込まれたプラグインが「Serverless」の項目と共有のページを追加し、ほかのプラグインはタブだけを追加します。プラグインは、Redmine の管理のメニューにまだその項目がないときだけ追加します(`Redmine::MenuManager.items(:admin_menu)`)。どのプラグインも、同じ 3 つのファイルを持ちます。登録先の `RedmineServerlessAdmin`(`lib/redmine_serverless_admin.rb`)、コントローラーの `ServerlessAdminController`、ビューの `serverless_admin/_tabs` です。Redmine のコードの読み込みとビューのパスは、最初に見つけたものを使い、ほかは使わないので、どのコピーも同じにしておきます(`SHARED_VERSION`)。各プラグインは、`init.rb` で、そこに自分のタブと接続テストを登録します(`register_tab`、`register_check`)。最初の登録が、メニューの項目を追加します。項目は `/admin/serverless` を開き、そこから最初のタブに移ります |
 | タブの並び | ステータス、ジョブ、メール送信、メール受信、S3。タブは、そのプラグインをインストールしているときだけ出ます |
 | このプラグインがないとき | 「ステータス」のタブは出ず、ほかのプラグインのタブは「Serverless」の下に出ます。たとえば、Redmine Serverless S3 だけをインストールした Redmine では、「Serverless」の項目に「S3」のタブが 1 つだけ出ます |
 | プラグインの一覧から | プラグインは、Redmine のプラグインの設定の画面を持たないので、プラグインの一覧に「設定」のリンクは出ません。設定は、それぞれのタブにあります |
-| プロジェクトの設定 | Redmine Serverless SES がプロジェクトの設定に足す「メール」のタブは、このメニューには含めません |
+| プロジェクトの設定 | Redmine Serverless SES がプロジェクトの設定に追加する「メール」のタブは、このメニューには含めません |
 
 <a id="status-and-connections"></a>
 
@@ -60,10 +60,10 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 | 確認する先 | 呼ぶ API |
 | --- | --- |
 | データベース | 設定した PostgreSQL のデータベース(RDS for PostgreSQL など)に新しい接続を作り、サーバーのバージョン(`SHOW server_version`)を読む。「PostgreSQL 16.4」のように、アダプターといっしょに出す |
-| S3 | `HeadBucket`。Redmine Serverless S3 が足す |
-| SES | `GetAccount`。Redmine Serverless SES が足す |
-| SQS | `GetQueueAttributes`。Redmine Serverless SQS が足す |
-| SSM | `GetParametersByPath`(1 件だけ)。Redmine Serverless SSM が足す |
+| S3 | `HeadBucket`。Redmine Serverless S3 が追加する |
+| SES | `GetAccount`。Redmine Serverless SES が追加する |
+| SQS | `GetQueueAttributes`。Redmine Serverless SQS が追加する |
+| SSM | `GetParametersByPath`(1 件だけ)。Redmine Serverless SSM が追加する |
 
 それぞれの確認は、そのプラグインが IAM の権限のページに書いた権限を使います。このプラグイン自身の権限は要りません。
 

@@ -8,7 +8,7 @@
 
 | 操作 | 対象 | 理由 |
 | --- | --- | --- |
-| なし | — | 「ステータス」の S3、SES、SQS、SSM の確認は、それぞれのプラグインが足し、それぞれの IAM の権限のページにある権限を使う([S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/iam.html)、[SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/iam.html)、[SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/iam.html)、[SSM](https://redmine-kit.github.io/redmine_serverless_ssm/ja/iam.html)) |
+| なし | — | 「ステータス」の S3、SES、SQS、SSM の確認は、それぞれのプラグインが追加し、それぞれの IAM の権限のページにある権限を使う([S3](https://redmine-kit.github.io/redmine_serverless_s3/ja/iam.html)、[SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/iam.html)、[SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/iam.html)、[SSM](https://redmine-kit.github.io/redmine_serverless_ssm/ja/iam.html)) |
 
 <a id="example-policy"></a>
 

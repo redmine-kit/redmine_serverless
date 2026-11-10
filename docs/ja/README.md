@@ -31,11 +31,11 @@ AWS のためのほかの機能は、別のプラグインです。Lambda 以外
 
 <a id="code-layout"></a>
 
-## コードの構成
+## コード構成
 
 Rails の初期化より前に要るもの(`/events` のミドルウェアとアセットの設定)は、`boot/redmine_serverless.rb` にあります。プラグインは gem でもあるので、Bundler がこのファイルを読み込みます([setup.md](setup.md#installation))。ほかは Redmine が読み込む `lib/redmine_serverless/` と `app/` にあり、`init.rb` が有効にします。
 
-プラグインは自分では AWS の API を呼ばないので、AWS SDK の gem は要りません。データベースのテーブルも足さないので、実行する migration はありません。差し替えた処理ごとに、Redmine の標準の仕組み(`rake redmine:plugins:test`)でテストを書いています([setup.md](setup.md#tests))。
+プラグインは自分では AWS の API を呼ばないので、AWS SDK の gem は要りません。データベースのテーブルも追加しないので、実行する migration はありません。差し替えた処理ごとに、Redmine の標準の仕組み(`rake redmine:plugins:test`)でテストを書いています([setup.md](setup.md#tests))。
 
 <a id="running-on-lambda"></a>
 
@@ -45,7 +45,7 @@ Lambda の上(`REDMINE_ROLE` があるとき)では、プラグインが Redmine
 
 | 何を | どうする | 理由 |
 | --- | --- | --- |
-| `/events` | ミドルウェアの並びの先頭の Rack のミドルウェア(`boot/` が登録する)が、データベースやセッションに触れる前に、`/events` に 204 を返す。ほかのパスはそのまま通す | Lambda Web Adapter は、関数 URL を通らないイベント(温めなど)を、`/events` への POST として Puma に渡す(`AWS_LWA_PASS_THROUGH_PATH`)。ロールがなければ、`/events` はふつうのパス(404) |
+| `/events` | ミドルウェアの並びの先頭の Rack のミドルウェア(`boot/` が登録する)が、データベースやセッションに触れる前に、`/events` に 204 を返す。ほかのパスはそのまま通す | Lambda Web Adapter は、関数 URL を通らないイベント(ウォームアップなど)を、`/events` への POST として Puma に渡す(`AWS_LWA_PASS_THROUGH_PATH`)。ロールがなければ、`/events` はふつうのパス(404) |
 | アセットの確認 | `config.assets.redmine_detect_update` を `false` にする。`boot/` が `after_initialize` で設定し、Redmine 自身の確認より前に動く | `production.rb` は `true` にし、Redmine は起動のときに古いアセットを `public/assets` に書き出す。Lambda ではファイルシステムが読み取り専用で、イメージにはビルドしたアセットがある |
 | 使えない Redmine の設定 | 無効に固定し、設定の画面に表示する | [admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda) |
 
