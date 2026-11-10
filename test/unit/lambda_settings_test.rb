@@ -50,9 +50,12 @@ module RedmineServerless
     end
 
     def test_subversion_and_git_repositories_can_be_created_on_lambda
+      project = Project.find(3)
+      subversion = Repository::Subversion.new(project: project, url: 'https://svn.example.com/repo', identifier: 'svn')
+      git = Repository::Git.new(project: project, url: '/tmp/repo.git', identifier: 'git')
       with_role('web') do
-        assert Repository::Subversion.new(project: Project.find(3), url: 'https://svn.example.com/repo', identifier: 'svn').valid?
-        assert Repository::Git.new(project: Project.find(3), url: '/tmp/repo.git', identifier: 'git').valid?
+        assert subversion.valid?
+        assert git.valid?
       end
     end
 
