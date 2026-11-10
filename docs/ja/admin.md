@@ -29,7 +29,7 @@
 
 <a id="the-serverless-menu"></a>
 
-## Serverless のメニュー
+## Serverless メニュー
 
 Redmine Serverless のプラグインは、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に置きます。画面は、1 つのページのタブになります。
 
@@ -65,7 +65,7 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 | SQS | `GetQueueAttributes`。Redmine Serverless SQS が追加する |
 | SSM | `GetParametersByPath`(1 件だけ)。Redmine Serverless SSM が追加する |
 
-それぞれの確認は、そのプラグインが IAM の権限のページに書いた権限を使います。このプラグイン自身の権限は要りません。
+それぞれの確認は、そのプラグインが IAM 権限のページに書いた権限を使います。このプラグイン自身の権限は要りません。
 
 IAM の権限、ネットワークの設定、SSM の設定を変えたあとに、どこまで要求が届くかをこの確認で見られます。Lambda を VPC に入れたときは、VPC エンドポイントやセキュリティグループの設定の確認にも使えます。
 

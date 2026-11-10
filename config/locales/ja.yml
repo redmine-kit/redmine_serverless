@@ -7,7 +7,7 @@ ja:
   label_serverless_fixed_settings: 変更不可の設定
   label_serverless_connection_check: 接続テスト
   label_serverless_check_database: データベース
-  label_serverless_response_time: 応答時間(ms)
+  label_serverless_response_time: 応答時間 (ms)
   label_serverless_ok: OK
   label_serverless_failed: 失敗
   field_serverless_function_name: 関数名

@@ -62,7 +62,7 @@ GitHub Packages からインストールするには、公開のパッケージ�
 
 <a id="aws-resources"></a>
 
-## AWS のリソース
+## AWS リソース
 
 | リソース | 設定 |
 | --- | --- |
@@ -70,7 +70,7 @@ GitHub Packages からインストールするには、公開のパッケージ�
 
 <a id="iam-permissions"></a>
 
-## IAM の権限
+## IAM 権限
 
 プラグインに要る権限と例のポリシーは、[iam.md](iam.md) にあります。
 
