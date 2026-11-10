@@ -8,15 +8,22 @@ module RedmineServerless
   # stay in the database and are not used.
   module LambdaSettings
     FIXED = {
-      enabled_scm: [],
       autofetch_changesets: '0',
       sys_api_enabled: '0',
       mail_handler_api_enabled: '0'
     }.freeze
 
+    # The repository types whose clients the image has. The others stay off
+    # whatever is saved.
+    SCM = %w[Subversion Git].freeze
+
     FIXED.each do |name, value|
       define_method(name) { RedmineServerless.lambda? ? value.dup : super() }
       define_method(:"#{name}?") { RedmineServerless.lambda? ? false : super() }
+    end
+
+    def enabled_scm
+      RedmineServerless.lambda? ? super & SCM : super
     end
 
     def self.install

@@ -19,6 +19,7 @@ module RedmineServerless
 
       assert_response :success
       assert_includes response.body, 'settings[sys_api_enabled]'
+      assert_includes response.body, '["Subversion","Git"]'
       assert_includes response.body, "Can't be set in this environment"
     end
 

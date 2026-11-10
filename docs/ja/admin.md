@@ -54,7 +54,7 @@ Redmine Serverless のプラグインは、どれをインストールしてい�
 | Lambda 関数 | 関数名、役割(`REDMINE_ROLE`)、バージョン、メモリ、リージョン、イメージ URI | Lambda の環境変数(`AWS_LAMBDA_FUNCTION_NAME` など)と、ビルドのときにイメージに入れた値 |
 | バージョン | Redmine、Ruby、Rails、入れている Redmine Serverless のプラグイン | Redmine の情報の画面と同じもの |
 | Parameter Store | `/<instance>/env/` の下のパラメーターの名前と、読めたかどうか(値は出さない)。[Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/ja/) を入れたときに出す | 起動のときに読んだ結果(`RedmineServerlessSsm.loaded`) |
-| 変更不可の設定 | 下の「Lambda で使えない Redmine の設定」の一覧と、今の値(はい/いいえ。空の一覧は「なし」) | プラグインが決めた値 |
+| 変更不可の設定 | 下の「Lambda で使えない Redmine の設定」のうち、無効に固定する設定と、今の値 (はい/いいえ) | プラグインが決めた値 |
 | 接続テスト | データベースと、入れているプラグインの AWS のサービスに届くか、応答時間(ミリ秒) | 「テスト」を押したときに、軽い呼び出しを 1 回ずつ行う(下の表) |
 
 | 確認する先 | 呼ぶ API |
@@ -75,20 +75,19 @@ IAM の権限、ネットワークの設定、SSM の設定を変えたあとに
 
 Redmine の標準の設定のうち、Lambda の上では動かないものや、この設計では開けておかないものは、プラグインが無効に固定し、Redmine の設定の画面にもそう表示します。
 
-![Lambda の上の「管理 › 設定 › リポジトリ」。バージョン管理システムを選べず、固定している設定は入力できない状態で注記が付く](./images/fixed-settings.png)
+![Lambda の上の「管理 › 設定 › リポジトリ」。Subversion と Git だけを選べ、ほかのバージョン管理システムと固定している設定は入力できない状態で注記が付く](./images/fixed-settings.png)
 
 | 設定(Redmine の画面の名前) | 画面 | プラグインの扱い | 理由 |
 | --- | --- | --- | --- |
-| 使用するバージョン管理システム(`enabled_scm`) | 管理 › 設定 › リポジトリ | 空に固定する。プロジェクトにリポジトリを作れなくなる | リポジトリを置く場所がない(`/tmp` は環境ごとで、消える)。Git などのコマンドもイメージに入れない |
-| コミットを自動取得する(`autofetch_changesets`) | 同上 | 無効に固定する | 同上 |
-| リポジトリ管理用のWebサービスを有効にする(`sys_api_enabled`) | 同上 | 無効に固定する | 同上 |
+| 使用するバージョン管理システム(`enabled_scm`) | 管理 › 設定 › リポジトリ | Subversion と Git だけを有効にでき、ほかは無効になる。プロジェクトには Subversion と Git のリポジトリを作成できる | Serverless のイメージには、Subversion と Git のクライアントだけがある。Subversion のリポジトリはリモート (`https://`、`svn://`) でもよく、Redmine はコピーを持たずに `svn` で読む。Git のリポジトリは、Redmine がローカルのベアリポジトリを `git` で読む。Lambda で書き込めるのは `/tmp` だけで、`/tmp` に置いたリポジトリは実行環境が停止すると失われる。Git のリポジトリの保存先は未決定 ([Serverless の lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#repositories)) |
+| コミットを自動取得する(`autofetch_changesets`) | 同上 | 無効に固定する | 有効にすると、Redmine はリポジトリの画面を表示するときに新しいコミットを取得するので、画面がクライアントの処理を待つ。大きなリポジトリの最初の取得は、web の関数のタイムアウト (60 秒) までに終わらないことがある。コミットは代わりに `redmine-task` の `rake redmine:fetch_changesets` で取得する ([Serverless の lambda.md](https://redmine-kit.github.io/serverless/ja/lambda.html#repositories)) |
+| リポジトリ管理用のWebサービスを有効にする(`sys_api_enabled`) | 同上 | 無効に固定する | この Web サービスは、サーバーのディスクにリポジトリを作成する `reposman.rb` と、Redmine にコミットの取得を依頼するフックのためのもの。Lambda にはリポジトリを置くディスクがなく、取得は上のタスクで行うので、開けない |
 | 受信メール用のWebサービスを有効にする(`mail_handler_api_enabled`) | 管理 › 設定 › 受信メール | 無効に固定する | メールは SES で受けて `redmine-task` が取り込む([mail.md](https://redmine-kit.github.io/serverless/ja/mail.html#receiving)、[Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/ja/))。外から HTTP でメールを送り込める Web サービスを開けない |
 
 | 項目 | 内容 |
 | --- | --- |
-| 値を固定する | プラグインが、上の設定の読み出し(`Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?`)を差し替えて、決めた値を返します。プラグインが Redmine の処理を差し替えるのはここだけです。Redmine のバージョンアップでは、これらの読み出しが変わっていないかを確認します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません |
+| 値を固定する | プラグインが、上の設定の読み出し(`Setting.enabled_scm`、`Setting.autofetch_changesets?`、`Setting.sys_api_enabled?`、`Setting.mail_handler_api_enabled?`)を差し替えて、決めた値を返します。`Setting.enabled_scm` は、保存した値から Subversion と Git 以外を除いて返します。プラグインが Redmine の処理を差し替えるのはここだけです。Redmine のバージョンアップでは、これらの読み出しが変わっていないかを確認します。設定の画面から保存しても、これらの値は変わりません。データベースに古い値が残っていても、使われません。Subversion と Git の選択だけは、保存した値を使います |
 | 画面に表示する | Redmine の設定の画面で、上の設定の入力を押せなくし、「この環境では設定できません」と添えます。画面のテンプレートは差し替えず、設定の画面を開いたときだけ、プラグインが小さな JavaScript を読み込んで表示を変えます(Redmine の標準のフック `view_layouts_base_html_head`)。JavaScript が動かなくても、値は上のとおり固定されているので、効き目は変わりません |
-| プロジェクトのモジュール | バージョン管理システムを選べないので、モジュールの「リポジトリ」を有効にしても、リポジトリは作れません。「新規プロジェクトにおいてデフォルトで有効になるモジュール」(`default_projects_modules`)からは外しておきます(設定のファイルの `redmine.settings`。[deploy-config.md](https://redmine-kit.github.io/serverless/ja/deploy-config.html)) |
 | 条件 | Lambda の上(`REDMINE_ROLE` があるとき)だけ固定します。手元のテストや、Lambda 以外の環境では、Redmine の標準のままです |
 | 管理画面の「情報」 | Redmine の標準の確認(ファイルの保存先に書き込めるか、ジョブのキューをデフォルトから変えたか、ImageMagick、Ghostscript、Pandoc など)は、Serverless で通る見込みです(保存先は `/tmp/redmine/files`、ジョブは `:sqs`) |
 

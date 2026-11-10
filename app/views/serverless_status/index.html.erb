@@ -34,8 +34,7 @@
 <% if RedmineServerless.lambda? %>
 <div class="box tabular settings">
   <% @status.fixed_settings.each do |name, value| %>
-  <%# Lists as text ("none" when empty), switches as Yes/No %>
-  <p><label><%= l(:"setting_#{name}") %></label><%= value.is_a?(Array) ? (value.join(', ').presence || l(:label_none)) : format_object(value.to_s == '1') %> <em class="info"><%= name %></em></p>
+  <p><label><%= l(:"setting_#{name}") %></label><%= format_object(value.to_s == '1') %> <em class="info"><%= name %></em></p>
   <% end %>
 </div>
 <% else %>
