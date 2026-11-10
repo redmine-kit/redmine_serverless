@@ -3,7 +3,7 @@
 # Running Redmine on AWS Lambda (docs/README.md). The features are on only
 # when REDMINE_ROLE is set (web, worker or task), as on Lambda.
 module RedmineServerless
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
   ROLES = %w[web worker task].freeze
 
   def self.role
