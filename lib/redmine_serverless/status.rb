@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RedmineServerless
-  # What "Status and connections" shows (docs/admin.md#status-and-connections).
+  # What the "Status" tab shows (docs/admin.md#status-and-connections).
   # No secret values: only names.
   class Status
     def function
@@ -37,11 +37,20 @@ module RedmineServerless
       db_config = ActiveRecord::Base.connection_db_config
       adapter = db_config.adapter_class.new(db_config.configuration_hash)
       begin
-        adapter.select_value('SELECT 1')
-        "user #{adapter.select_value('SELECT current_user')}"
+        "#{adapter.adapter_name} #{database_version(adapter)}"
       ensure
         adapter.disconnect!
       end
+    end
+
+    # The server's version ("16.4"), which also shows that a query runs.
+    def self.database_version(adapter)
+      sql = case adapter.adapter_name
+            when /postg/i then 'SHOW server_version'
+            when /sqlite/i then 'SELECT sqlite_version()'
+            else 'SELECT VERSION()'
+            end
+      adapter.select_value(sql).to_s.split.first
     end
   end
 end

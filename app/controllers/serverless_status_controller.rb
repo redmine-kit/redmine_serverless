@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# "Status and connections" (docs/admin.md#status-and-connections).
+# The "Status" tab (docs/admin.md#status-and-connections).
 class ServerlessStatusController < ApplicationController
   layout 'admin'
   self.main_menu = false

@@ -4,7 +4,7 @@ Redmine Serverless(`redmine_serverless`)は、Redmine を AWS Lambda で動か�
 
 - [導入](setup.md): 動作環境、インストール、設定、AWS のリソース、ネットワーク、テスト
 - [IAM の権限](iam.md): 権限、ポリシーの例、リソースベースのポリシー
-- [管理画面](admin.md): 状態と接続、Lambda で使えない Redmine の設定
+- [管理画面](admin.md): ステータス、Lambda で使えない Redmine の設定
 - [Lambda で動かすとき](#running-on-lambda): `/events`、アセットの確認、テスト
 
 <a id="features"></a>
@@ -16,7 +16,7 @@ Redmine の標準の動きをできるだけ保ち、自前で書くのは、Lam
 | 機能 | 内容 | 有効にする条件 | 資料 |
 | --- | --- | --- | --- |
 | Lambda での実行 | Lambda Web Adapter の `/events` に 204 を返す Rack のミドルウェア、アセットの自動の書き出しを止める設定、Lambda で使えない Redmine の設定を無効に固定して画面に表示する | `REDMINE_ROLE` がある | [admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda) |
-| 管理画面 | 共有の「Serverless」のメニューの「状態と接続」のタブと、ほかのプラグインの確認 | 管理者 | [admin.md](admin.md) |
+| 管理画面 | 共有の「Serverless」のメニューの「ステータス」のタブと、ほかのプラグインの確認 | 管理者 | [admin.md](admin.md) |
 
 AWS のためのほかの機能は、別のプラグインです。Lambda 以外でも動きます。
 
@@ -27,7 +27,7 @@ AWS のためのほかの機能は、別のプラグインです。Lambda 以外
 | [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/ja/) | SQS でのジョブ。`aws-activejob-sqs` の設定、ジョブの失敗の記録、送り直し |
 | [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/ja/) | SSM Parameter Store の設定と秘密の値。Rails が起動する前に読む |
 
-どのプラグインも、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に、1 つのページのタブとして置きます([admin.md](admin.md#the-serverless-menu))。このプラグインをインストールしているときは、それぞれの確認が、接続の確認にも加わります。
+どのプラグインも、どれをインストールしていても、管理の画面を Redmine の管理のメニューの 1 つの項目「Serverless」の下に、1 つのページのタブとして置きます([admin.md](admin.md#the-serverless-menu))。このプラグインをインストールしているときは、それぞれの確認が、接続テストにも加わります。
 
 <a id="code-layout"></a>
 

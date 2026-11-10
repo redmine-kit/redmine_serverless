@@ -18,10 +18,10 @@ The specifications in this page were checked against official information and th
 
 | Page | Added by | Contents |
 | --- | --- | --- |
-| Status and connections | This plugin | The running function and its version, whether the database and each AWS service are reachable, names of loaded settings, disabled Redmine settings |
+| Status | This plugin | The running function and its version, whether the database and each AWS service are reachable, names of loaded settings, read-only Redmine settings |
 | Jobs | [Redmine Serverless SQS](https://redmine-kit.github.io/redmine_serverless_sqs/admin.html) | Added by that plugin when it is installed |
-| Sending email, Receiving email | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) | Added by that plugin when it is installed |
-| Attachments in S3 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html) | Added by that plugin when it is installed |
+| Email sending, Email receiving | [Redmine Serverless SES](https://redmine-kit.github.io/redmine_serverless_ses/admin.html) | Added by that plugin when it is installed |
+| S3 | [Redmine Serverless S3](https://redmine-kit.github.io/redmine_serverless_s3/admin.html) | Added by that plugin when it is installed |
 
 ## The Serverless menu
 
@@ -32,26 +32,28 @@ All the Redmine Serverless plugins put their administration pages under one item
 | Item | Details |
 | --- | --- |
 | One item | The first plugin that loads adds the "Serverless" item and the shared page; the others only add their tabs. A plugin adds the item only if Redmine's administration menu does not have it yet (`Redmine::MenuManager.items(:admin_menu)`). Every plugin carries the same three files: the registry `RedmineServerlessAdmin` (`lib/redmine_serverless_admin.rb`), the controller `ServerlessAdminController` and the view `serverless_admin/_tabs`. Redmine's code loader and view paths use the first copy and ignore the others, so the copies are kept the same (`SHARED_VERSION`). Each plugin registers its tab and its connection check there in `init.rb` (`register_tab`, `register_check`); the first registration adds the menu item. The item opens `/admin/serverless`, which goes to the first tab |
-| Order of the tabs | Status and connections, Jobs, Sending email, Receiving email, Attachments in S3. A tab appears only when its plugin is installed |
-| Without this plugin | The "Status and connections" tab is not shown, and the other plugins' tabs still appear under "Serverless". For example, a Redmine with only Redmine Serverless S3 has a "Serverless" item with one tab, "Attachments in S3" |
+| Order of the tabs | Status, Jobs, Email sending, Email receiving, S3. A tab appears only when its plugin is installed |
+| Without this plugin | The "Status" tab is not shown, and the other plugins' tabs still appear under "Serverless". For example, a Redmine with only Redmine Serverless S3 has a "Serverless" item with one tab, "Attachments in S3" |
 | From the plugin list | The plugins have no settings page of Redmine's plugin settings, so the plugin list shows no "Configure" link. Their settings are on their tabs |
 | Project settings | The "Mail" tab in project settings that Redmine Serverless SES adds is not part of this menu |
 
-## Status and connections
+<a id="status-and-connections"></a>
 
-![The Status and connections tab after Check the connections: the function, the versions, the fixed settings and the results of the checks](./images/status.png)
+## Status
+
+![The Status tab after Test: the Lambda function, the versions, the read-only settings and the results of the connection test](./images/status.png)
 
 | Item | Contents | Source |
 | --- | --- | --- |
-| Function | Function name, role (`REDMINE_ROLE`), version, image tag | Lambda environment variables (`AWS_LAMBDA_FUNCTION_NAME`, etc.) and values put into the image at build time |
+| Lambda function | Function name, role (`REDMINE_ROLE`), version, memory, Region, image URI | Lambda environment variables (`AWS_LAMBDA_FUNCTION_NAME`, etc.) and values put into the image at build time |
 | Versions | Redmine, Ruby, Rails, the installed Redmine Serverless plugins | The same as Redmine's information page |
-| Loaded settings | Names of parameters under `/<instance>/env/` and whether they could be read (values are not shown). Shown when [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/) is installed | The result of reading them at start-up (`RedmineServerlessSsm.loaded`) |
-| Disabled Redmine settings | The list in "Redmine settings that cannot work on Lambda" below and their current values | Values set by the plugin |
-| Connection check | Whether the database and the AWS services of the installed plugins are reachable, and how long it took | When the button is pressed, make one light call to each (table below) |
+| Parameter Store | Names of parameters under `/<instance>/env/` and whether they could be read (values are not shown). Shown when [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/) is installed | The result of reading them at start-up (`RedmineServerlessSsm.loaded`) |
+| Read-only settings | The list in "Redmine settings that cannot work on Lambda" below and their current values (Yes/No, or "none" for an empty list) | Values set by the plugin |
+| Connection test | Whether the database and the AWS services of the installed plugins are reachable, and the response time in milliseconds | When "Test" is clicked, make one light call to each (table below) |
 
 | Target | API called |
 | --- | --- |
-| Database | Open a new connection to the configured PostgreSQL database (such as RDS for PostgreSQL) and run `SELECT 1`. Also show the database user connected as (`current_user`) |
+| Database | Open a new connection to the configured PostgreSQL database (such as RDS for PostgreSQL) and read the server's version (`SHOW server_version`), shown with the adapter, such as "PostgreSQL 16.4" |
 | S3 | `HeadBucket`, added by Redmine Serverless S3 |
 | SES | `GetAccount`, added by Redmine Serverless SES |
 | SQS | `GetQueueAttributes`, added by Redmine Serverless SQS |
@@ -77,7 +79,7 @@ Standard Redmine settings that do not work on Lambda, or that this design does n
 | Item | Details |
 | --- | --- |
 | Fixing the values | The plugin replaces the readers of the settings above (`Setting.enabled_scm`, `Setting.autofetch_changesets?`, `Setting.sys_api_enabled?`, `Setting.mail_handler_api_enabled?`) so they return the fixed values. This is the plugin's only replacement of Redmine code; when Redmine is upgraded, check that these readers have not changed. Saving from the settings page does not change these values. Old values left in the database are not used |
-| Showing it on the page | On Redmine's settings page, the inputs for the settings above are disabled, with the note "Not available in a serverless environment (Redmine Serverless)". The page templates are not replaced. Only when the settings page is opened does the plugin load a small JavaScript file that changes the display (Redmine's standard hook `view_layouts_base_html_head`). Even if the JavaScript does not run, the values are fixed as above, so the effect is the same |
+| Showing it on the page | On Redmine's settings page, the inputs for the settings above are disabled, with the note "Can't be set in this environment". The page templates are not replaced. Only when the settings page is opened does the plugin load a small JavaScript file that changes the display (Redmine's standard hook `view_layouts_base_html_head`). Even if the JavaScript does not run, the values are fixed as above, so the effect is the same |
 | Project modules | Because no SCM can be selected, enabling the "Repository" module does not let anyone create a repository. It is removed from the default modules for new projects (`default_projects_modules`) (`redmine.settings` in the configuration file; [deploy-config.md](https://redmine-kit.github.io/serverless/deploy-config.html)) |
 | Condition | The values are fixed only on Lambda (when `REDMINE_ROLE` is set). In local tests and environments other than Lambda, standard Redmine behavior applies |
 | "Information" on the administration page | Redmine's standard checks (whether the file storage directory is writable, whether the job queue was changed from the default, ImageMagick, Ghostscript, Pandoc, etc.) are expected to pass in Serverless (storage is `/tmp/redmine/files`, jobs use `:sqs`) |

@@ -1,21 +1,19 @@
 en:
   label_serverless_admin: Serverless
-  label_serverless_status: Status and connections
-  label_serverless_function: Function
+  label_serverless_status: Status
+  label_serverless_function: Lambda function
   label_serverless_versions: Versions
-  label_serverless_loaded_settings: Settings read from SSM Parameter Store
-  label_serverless_fixed_settings: Redmine settings fixed on Lambda
-  label_serverless_connection_check: Connection check
+  label_serverless_loaded_settings: Parameter Store
+  label_serverless_fixed_settings: Read-only settings
+  label_serverless_connection_check: Connection test
   label_serverless_check_database: Database
-  label_serverless_detail: Detail
+  label_serverless_response_time: Response time (ms)
   label_serverless_ok: OK
   label_serverless_failed: Failed
-  button_serverless_check: Check the connections
   field_serverless_function_name: Function name
-  field_serverless_function_role: Role (REDMINE_ROLE)
-  field_serverless_function_version: Function version
-  field_serverless_function_memory: Memory (MB)
+  field_serverless_function_role: Role
+  field_serverless_function_version: Version
+  field_serverless_function_memory: Memory
   field_serverless_function_region: Region
-  field_serverless_function_image: Image
-  text_serverless_setting_fixed: Not available in a serverless environment (Redmine Serverless).
-  text_serverless_not_on_lambda: REDMINE_ROLE is not set, so Redmine's settings are not fixed.
+  field_serverless_function_image: Image URI
+  text_serverless_setting_fixed: Can't be set in this environment

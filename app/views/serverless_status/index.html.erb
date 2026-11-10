@@ -2,9 +2,13 @@
 
 <h3><%= l(:label_serverless_function) %></h3>
 <div class="box tabular settings">
-  <% @status.function.each do |name, value| %>
-  <p><label><%= l(:"field_serverless_function_#{name}") %></label><%= value || '-' %></p>
-  <% end %>
+  <% function = @status.function %>
+  <p><label><%= l(:field_serverless_function_name) %></label><%= function[:name] || '-' %></p>
+  <p><label><%= l(:field_serverless_function_role) %></label><%= function[:role] || '-' %> <em class="info">REDMINE_ROLE</em></p>
+  <p><label><%= l(:field_serverless_function_version) %></label><%= function[:version] || '-' %></p>
+  <p><label><%= l(:field_serverless_function_memory) %></label><%= function[:memory] ? "#{number_with_delimiter(function[:memory].to_i)} MB" : '-' %></p>
+  <p><label><%= l(:field_serverless_function_region) %></label><%= function[:region] || '-' %></p>
+  <p><label><%= l(:field_serverless_function_image) %></label><%= function[:image] || '-' %></p>
 </div>
 
 <h3><%= l(:label_serverless_versions) %></h3>
@@ -30,16 +34,17 @@
 <% if RedmineServerless.lambda? %>
 <div class="box tabular settings">
   <% @status.fixed_settings.each do |name, value| %>
-  <p><label><%= l(:"setting_#{name}") %></label><%= Array(value).join(', ').presence || '-' %> <em class="info"><%= name %></em></p>
+  <%# Lists as text ("none" when empty), switches as Yes/No %>
+  <p><label><%= l(:"setting_#{name}") %></label><%= value.is_a?(Array) ? (value.join(', ').presence || l(:label_none)) : format_object(value.to_s == '1') %> <em class="info"><%= name %></em></p>
   <% end %>
 </div>
 <% else %>
-<p class="nodata"><%= l(:text_serverless_not_on_lambda) %></p>
+<p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>
 
 <h3><%= l(:label_serverless_connection_check) %></h3>
 
-<p><%= link_to sprite_icon('checked', l(:button_serverless_check)), serverless_status_check_path, method: :post, class: 'icon icon-checked' %></p>
+<p><%= link_to l(:button_test), serverless_status_check_path, method: :post %></p>
 
 <% if @results %>
 <div class="autoscroll">
@@ -47,8 +52,8 @@
 <tr>
     <th><%= l(:field_name) %></th>
     <th><%= l(:field_status) %></th>
-    <th><%= l(:label_serverless_detail) %></th>
-    <th>ms</th>
+    <th><%= l(:label_details) %></th>
+    <th><%= l(:label_serverless_response_time) %></th>
 </tr></thead>
 <tbody>
 <% @results.each do |result| %>
@@ -60,7 +65,7 @@
       </span>
     </td>
     <td class="description"><%= result.detail %></td>
-    <td><%= result.milliseconds %></td>
+    <td class="milliseconds"><%= number_with_delimiter(result.milliseconds) %></td>
 </tr>
 <% end %>
 </tbody>

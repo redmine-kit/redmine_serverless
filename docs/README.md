@@ -14,7 +14,7 @@ The plugin keeps Redmine's standard behavior as far as possible and implements o
 | Feature | Contents | Enabled when | Page |
 | --- | --- | --- | --- |
 | Running on Lambda | A Rack middleware that returns 204 for Lambda Web Adapter's `/events`, a setting that stops automatic asset compilation, Redmine settings that cannot work on Lambda fixed to disabled and shown on screen | `REDMINE_ROLE` is set | [admin.md](admin.md#redmine-settings-that-cannot-work-on-lambda) |
-| Administration pages | The "Status and connections" tab under the shared "Serverless" menu, with the checks of the other plugins | Administrators | [admin.md](admin.md) |
+| Administration pages | The "Status" tab under the shared "Serverless" menu, with the checks of the other plugins | Administrators | [admin.md](admin.md) |
 
 The other features for AWS are separate plugins, which also work outside Lambda:
 

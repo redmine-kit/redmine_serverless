@@ -50,7 +50,7 @@ Installing from GitHub Packages needs a GitHub token with `read:packages`, even 
 | --- | --- | --- |
 | `REDMINE_ROLE` | Turns on the features for Lambda ([README.md](README.md#features)) | Required on Lambda. Per function: `web`, `worker` or `task`. Without it, the features stay off |
 
-To read settings and secrets from SSM Parameter Store at start-up, use [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/). With it installed, "Status and connections" shows the names of the parameters read.
+To read settings and secrets from SSM Parameter Store at start-up, use [Redmine Serverless SSM](https://redmine-kit.github.io/redmine_serverless_ssm/). With it installed, the "Status" tab shows the names of the parameters read.
 
 ## AWS resources
 
@@ -66,7 +66,7 @@ The permissions the plugin needs, with an example policy, are in [iam.md](iam.md
 
 | Destination | API | In a VPC without internet access |
 | --- | --- | --- |
-| The database | PostgreSQL (the database check on "Status and connections") | A security group rule from the functions to the database port |
+| The database | PostgreSQL (the database test on the "Status" tab) | A security group rule from the functions to the database port |
 
 ## Tests
 

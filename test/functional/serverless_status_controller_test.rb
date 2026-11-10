@@ -17,11 +17,14 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'h2', text: 'Serverless'
     assert_select 'div.tabs a#tab-status.selected'
-    assert_select 'div.box.tabular p', text: /REDMINE_ROLE\)\s*web/
+    assert_select 'div.box.tabular p', text: /Role\s*web\s*REDMINE_ROLE/
     assert_select 'div.box.tabular p label', text: /Redmine Serverless/
     assert_select 'div.box.tabular p em.info', text: 'enabled_scm'
     assert_select 'table.list', 0, 'name/value data is laid out as .box.tabular rows, not tables'
-    assert_select 'p a.icon.icon-checked[data-method=post]'
+    assert_select 'h3', text: 'Read-only settings'
+    assert_select 'div.box.tabular p', text: /Enable WS for repository management\s*No\s*sys_api_enabled/
+    assert_select 'div.box.tabular p', text: /none\s*enabled_scm/
+    assert_select 'p a[data-method=post]:not(.icon)', text: 'Test'
   end
 
   def test_index_without_the_role
@@ -30,7 +33,7 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
     end
 
     assert_response :success
-    assert_select 'p', text: /REDMINE_ROLE is not set/
+    assert_select 'p.nodata', text: 'No data to display'
   end
 
   def test_check_runs_the_connection_checks
@@ -38,7 +41,9 @@ class ServerlessStatusControllerTest < Redmine::ControllerTest
 
     assert_response :success
     assert_select 'table.list.checks tr.ok td.name', text: 'Database'
-    assert_select 'table.list.checks tr.ok td.description', text: /\Auser /
+    assert_select 'table.list.checks tr.ok td.description', text: /\APostgreSQL \d+(\.\d+)*\z/
+    assert_select 'table.list.checks th', text: 'Response time (ms)'
+    assert_select 'table.list.checks tr.ok td.milliseconds', text: /\A[\d,]+\z/
     assert_select 'table.list.checks tr.ok td.tick span.icon-ok'
   end
 

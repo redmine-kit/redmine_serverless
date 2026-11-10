@@ -19,7 +19,7 @@ module RedmineServerless
 
       assert_response :success
       assert_includes response.body, 'settings[sys_api_enabled]'
-      assert_includes response.body, 'Not available in a serverless environment'
+      assert_includes response.body, "Can't be set in this environment"
     end
 
     def test_standard_page_without_the_role
@@ -28,7 +28,7 @@ module RedmineServerless
       end
 
       assert_response :success
-      assert_not_includes response.body, 'Not available in a serverless environment'
+      assert_not_includes response.body, "Can't be set in this environment"
     end
   end
 end
