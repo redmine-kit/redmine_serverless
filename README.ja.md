@@ -8,7 +8,7 @@ Redmine を AWS Lambda で動かすための Redmine のプラグインです。
 
 [English](README.md)
 
-> **状態:** 開発の初期です。`/events` のミドルウェア、設定の固定、「Serverless」の管理画面を実装し、Redmine 7.0.3 でテストしています。
+> **状態:** 開発の初期です。実装し、Redmine 7.0.3 でテストしています。
 
 <a id="documentation"></a>
 
